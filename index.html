@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Your Visit</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #f7f4ef;
@@ -16,6 +16,9 @@
     --border: #e8e2d9;
     --day-bg: #1a1612;
     --day-text: #f7f4ef;
+    --spine: #e0d9ce;
+    --dot: #c8502a;
+    --dot-border: #f7f4ef;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -25,6 +28,7 @@
     color: var(--ink);
     font-family: 'Jost', sans-serif;
     min-height: 100vh;
+    overscroll-behavior: none;
   }
 
   /* ── LOGIN ── */
@@ -51,10 +55,7 @@
     z-index: 0;
   }
 
-  #login-screen > * {
-    position: relative;
-    z-index: 1;
-  }
+  #login-screen > * { position: relative; z-index: 1; }
 
   .login-eyebrow {
     display: flex;
@@ -67,12 +68,7 @@
     color: #c9a96e;
     margin-bottom: 3rem;
   }
-
-  .login-eyebrow::before,
-  .login-eyebrow::after {
-    content: '\2014';
-    color: #c9a96e;
-  }
+  .login-eyebrow::before, .login-eyebrow::after { content: '\2014'; color: #c9a96e; }
 
   .login-title {
     font-family: 'Cormorant Garamond', serif;
@@ -86,7 +82,6 @@
   }
 
   .login-byline {
-    font-family: 'Jost', sans-serif;
     font-size: 0.8rem;
     letter-spacing: 0.12em;
     color: rgba(245,240,232,0.45);
@@ -125,7 +120,6 @@
     transition: border-color 0.2s;
     margin-bottom: 1rem;
   }
-
   .login-box input:focus { border-color: var(--accent); }
 
   .login-btn {
@@ -143,7 +137,6 @@
     cursor: pointer;
     transition: opacity 0.2s;
   }
-
   .login-btn:hover { opacity: 0.85; }
 
   .login-error {
@@ -180,20 +173,16 @@
     color: var(--day-text);
     line-height: 1.1;
   }
+  .header-name span { color: var(--accent); font-style: italic; }
 
-  .header-name span {
-    color: var(--accent);
-    font-style: italic;
-  }
-
-  /* ── DAY GROUP ── */
-  .day-group { margin-bottom: 0.5rem; }
+  /* ── DAY SECTION ── */
+  .day-group { margin-bottom: 0.25rem; }
 
   .day-label {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    padding: 1.25rem 1.25rem 0.6rem;
+    padding: 1.5rem 1.25rem 0.75rem;
   }
 
   .day-num {
@@ -225,118 +214,315 @@
   .day-rule {
     height: 1px;
     background: var(--border);
-    margin: 0 1.25rem 0.75rem;
+    margin: 0 1.25rem;
   }
 
-  /* ── ACTIVITY CARD ── */
-  .cards { padding: 0 1rem; display: flex; flex-direction: column; gap: 0.75rem; }
-
-  .card {
-    background: var(--surface);
-    border-radius: 0.875rem;
-    overflow: hidden;
-    border: 1px solid rgba(232,226,217,0.6);
-    transition: box-shadow 0.2s;
+  /* ── TIMELINE ── */
+  /* Layout: [TIME 56px] [SPINE ZONE 32px] [CARD flex] [right pad] */
+  .timeline {
+    position: relative;
+    padding: 0.75rem 1rem 0.5rem 0;
   }
 
-  .card:active { box-shadow: 0 6px 24px rgba(0,0,0,0.1); }
+  /* The vertical spine sits in the spine zone */
+  .timeline::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    /* time col = 56px, left outer pad = 1.25rem ≈ 20px, spine centered in 32px zone → 20 + 56 + 16 = 92px */
+    left: 92px;
+    width: 2px;
+    background: var(--spine);
+    z-index: 0;
+  }
 
-  .card-inner { padding: 1.1rem 1.25rem 1.25rem; }
+  .tl-row {
+    display: flex;
+    align-items: flex-start;
+    position: relative;
+    margin-bottom: 0.75rem;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
 
-  /* TIME — big and bold */
-  .card-time {
+  /* TIME column */
+  .tl-time {
+    width: 56px;
+    min-width: 56px;
+    padding-left: 1.25rem;
+    padding-top: 0.8rem;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .tl-time-num {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 2.2rem;
+    font-size: 1.05rem;
     font-weight: 300;
     color: var(--accent);
     line-height: 1;
-    margin-bottom: 0.3rem;
-    letter-spacing: 0.02em;
-    opacity: 0.85;
+    display: block;
   }
 
-  .card-time-label {
+  .tl-time-ampm {
     font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    color: var(--ink-muted);
+    display: block;
+    margin-top: 0.05rem;
+  }
+
+  /* DOT column — 32px wide, spine at center (16px from left) */
+  .tl-dot-col {
+    width: 32px;
+    min-width: 32px;
+    display: flex;
+    justify-content: center;
+    padding-top: 0.95rem;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .tl-dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--dot);
+    border: 2px solid var(--bg);
+    box-shadow: 0 0 0 2px var(--dot);
+    transition: transform 0.18s;
+  }
+
+  .tl-row:active .tl-dot { transform: scale(1.35); }
+
+  /* CARD */
+  .tl-card {
+    flex: 1;
+    background: var(--surface);
+    border-radius: 0.875rem;
+    border: 1px solid rgba(232,226,217,0.7);
+    padding: 0.7rem 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    transition: box-shadow 0.2s, transform 0.15s;
+    min-width: 0;
+  }
+
+  .tl-row:active .tl-card {
+    box-shadow: 0 4px 18px rgba(0,0,0,0.1);
+    transform: scale(0.983);
+  }
+
+  /* ICON */
+  .tl-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 0.5rem;
+    background: var(--accent-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1.15rem;
+    line-height: 1;
+  }
+
+  .tl-card-text { flex: 1; min-width: 0; }
+
+  .tl-activity {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .tl-location {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.73rem;
+    color: var(--ink-muted);
+    font-weight: 300;
+    margin-top: 0.18rem;
+    overflow: hidden;
+  }
+
+  .tl-location span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .tl-location svg { flex-shrink: 0; opacity: 0.55; }
+
+  .tl-chevron {
+    color: #d4ccc3;
+    flex-shrink: 0;
+    transition: color 0.2s;
+  }
+  .tl-row:active .tl-chevron { color: var(--accent); }
+
+  /* no-detail rows */
+  .tl-row.no-detail { cursor: default; }
+  .tl-row.no-detail:active .tl-card { transform: none; box-shadow: none; }
+  .tl-row.no-detail:active .tl-dot { transform: none; }
+
+  /* ── BOTTOM DRAWER ── */
+  .drawer-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(26,22,18,0.5);
+    z-index: 200;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.28s ease;
+  }
+  .drawer-overlay.open { opacity: 1; pointer-events: all; }
+
+  .drawer {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--surface);
+    border-radius: 1.25rem 1.25rem 0 0;
+    z-index: 201;
+    max-height: 82vh;
+    overflow-y: auto;
+    transform: translateY(100%);
+    transition: transform 0.32s cubic-bezier(0.32,0.72,0,1);
+    padding-bottom: max(env(safe-area-inset-bottom), 1.5rem);
+    -webkit-overflow-scrolling: touch;
+  }
+  .drawer.open { transform: translateY(0); }
+
+  .drawer-handle {
+    width: 36px; height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 0.75rem auto 0;
+  }
+
+  .drawer-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.1rem 1.5rem 1rem;
+  }
+
+  .drawer-icon {
+    width: 46px; height: 46px;
+    border-radius: 0.75rem;
+    background: var(--accent-light);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  .drawer-title-group { flex: 1; min-width: 0; }
+
+  .drawer-time {
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 500;
+    margin-bottom: 0.18rem;
+  }
+
+  .drawer-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.55rem;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1.15;
+  }
+
+  .drawer-divider { height: 1px; background: var(--border); margin: 0 1.5rem; }
+
+  .drawer-body {
+    padding: 1.2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+
+  .drawer-section-label {
+    font-size: 0.63rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--ink-muted);
     font-weight: 500;
-    margin-bottom: 0.6rem;
+    margin-bottom: 0.4rem;
   }
 
-  /* ACTIVITY — hero text */
-  .card-activity {
+  .drawer-story {
     font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(1.4rem, 5vw, 1.8rem);
-    font-weight: 300;
+    font-size: 1.05rem;
     color: var(--ink);
-    line-height: 1.2;
-    margin-bottom: 0.5rem;
-  }
-
-  /* LOCATION */
-  .card-location {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.35rem;
-    font-size: 0.82rem;
-    color: var(--ink-muted);
-    font-weight: 300;
-    margin-bottom: 0.5rem;
-  }
-
-  .card-location svg {
-    flex-shrink: 0;
-    margin-top: 1px;
-    color: var(--accent);
-    opacity: 0.7;
-  }
-
-  /* FIELD1 / notes */
-  .card-field1 {
-    font-size: 0.85rem;
-    color: var(--ink-muted);
-    line-height: 1.6;
-    font-weight: 300;
-    padding-top: 0.5rem;
-    border-top: 1px solid var(--border);
-    margin-top: 0.6rem;
-  }
-
-  /* STORY */
-  .card-story {
-    font-size: 0.88rem;
-    color: var(--ink-muted);
-    line-height: 1.7;
-    padding-top: 0.6rem;
-    border-top: 1px solid var(--border);
-    margin-top: 0.6rem;
+    line-height: 1.75;
     font-style: italic;
   }
 
-  /* URL link */
-  .card-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-    margin-top: 0.75rem;
-    padding: 0.55rem 1rem;
-    background: var(--accent-light);
-    color: var(--accent);
-    border-radius: 2rem;
-    font-size: 0.78rem;
-    font-weight: 500;
-    letter-spacing: 0.06em;
-    text-decoration: none;
-    transition: background 0.2s;
+  .drawer-notes {
+    font-size: 0.88rem;
+    color: var(--ink-muted);
+    line-height: 1.65;
+    font-weight: 300;
   }
 
-  .card-link:hover { background: #eedad2; }
+  .drawer-maps-link {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    background: #e8f5e9;
+    color: #2e7d32;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    text-decoration: none;
+    font-size: 0.84rem;
+    font-weight: 500;
+    transition: background 0.18s;
+  }
+  .drawer-maps-link:hover { background: #c8e6c9; }
 
-  /* accent strip on left of card for "now" */
-  .card.is-now { border-left: 4px solid var(--accent); }
+  .drawer-maps-icon {
+    width: 28px; height: 28px;
+    background: #2e7d32;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
 
-  /* ── LOADING / ERROR ── */
+  .drawer-url-link {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    background: var(--accent-light);
+    color: var(--accent);
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    text-decoration: none;
+    font-size: 0.84rem;
+    font-weight: 500;
+    transition: background 0.18s;
+  }
+  .drawer-url-link:hover { background: #eedad2; }
+
+  .drawer-url-icon {
+    width: 28px; height: 28px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  /* ── LOADING ── */
   .state-msg {
     display: flex;
     flex-direction: column;
@@ -359,8 +545,6 @@
   }
 
   @keyframes spin { to { transform: rotate(360deg); } }
-
-  .hidden { display: none !important; }
 </style>
 </head>
 <body>
@@ -387,19 +571,67 @@
   <main id="itinerary-body"></main>
 </div>
 
+<!-- DRAWER OVERLAY -->
+<div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
+
+<!-- BOTTOM DRAWER -->
+<div class="drawer" id="drawer">
+  <div class="drawer-handle"></div>
+  <div class="drawer-header">
+    <div class="drawer-icon" id="drawer-icon"></div>
+    <div class="drawer-title-group">
+      <div class="drawer-time" id="drawer-time"></div>
+      <div class="drawer-title" id="drawer-title"></div>
+    </div>
+  </div>
+  <div class="drawer-divider"></div>
+  <div class="drawer-body" id="drawer-body"></div>
+</div>
+
 <script>
 const SHEET_ID = '1Y0qgm9aov7qaQOcdE3khXit85loGs9FmU2tvsl0ZCXU';
 const API_KEY  = 'AIzaSyBpvELhAkbUZQXwjhz65S28tRX4iNHIdhk';
 
 const GROUPS = {
-  '2012':    { tab: 'obrien',     name: 'April Visit' },
-  'wyllie':  { tab: 'assynipple', name: 'Wyllie' },
-  'kelly':   { tab: 'kelly',      name: 'Stacey & Aaron' },
-  'GROUP4':  { tab: 'group4',     name: 'Group 4' },
-  'GROUP5':  { tab: 'group5',     name: 'Group 5' },
+  '2012':   { tab: 'obrien',     name: 'April Visit' },
+  'wyllie': { tab: 'assynipple', name: 'Wyllie' },
+  'kelly':  { tab: 'kelly',      name: 'Stacey & Aaron' },
+  'GROUP4': { tab: 'group4',     name: 'Group 4' },
+  'GROUP5': { tab: 'group5',     name: 'Group 5' },
 };
 
-// Check URL param on load
+/* ── ICON INFERENCE ── */
+const ICON_MAP = [
+  { keys: ['breakfast','brunch','café','cafe','coffee','bakery','pastry','croissant'], icon: '☕' },
+  { keys: ['lunch','dinner','restaurant','bistro','tavern','pub','bar','grill','tasting','wine','beer','cocktail','drinks','eat','meal'], icon: '🍽️' },
+  { keys: ['hike','hiking','trail','walk','nature','forest','woods','park','garden','botanical'], icon: '🥾' },
+  { keys: ['beach','swim','ocean','lake','river','kayak','canoe','boat','sail','surf'], icon: '🏖️' },
+  { keys: ['museum','gallery','art','exhibit','tour','history','heritage','castle','palace'], icon: '🏛️' },
+  { keys: ['check in','checkin','check-in','hotel','accommodation','lodge','inn','airbnb','stay','arrive','arrival'], icon: '🏨' },
+  { keys: ['check out','checkout','check-out','depart','departure','leave','flight','airport'], icon: '🧳' },
+  { keys: ['market','shop','shopping','store','boutique','vendor'], icon: '🛍️' },
+  { keys: ['spa','massage','relax','yoga','wellness','sauna'], icon: '🧘' },
+  { keys: ['concert','music','show','theatre','theater','performance','film','movie','cinema'], icon: '🎭' },
+  { keys: ['bike','cycling','cycle','ride'], icon: '🚴' },
+  { keys: ['drive','car','road trip'], icon: '🚗' },
+  { keys: ['free time','leisure','explore','wander','stroll'], icon: '🗺️' },
+  { keys: ['welcome','meet','greeting'], icon: '👋' },
+  { keys: ['sunrise','sunset','view','overlook','scenic'], icon: '🌅' },
+  { keys: ['farm','winery','vineyard','orchard','harvest'], icon: '🌾' },
+  { keys: ['picnic','bbq','barbecue','outdoor dining'], icon: '🧺' },
+  { keys: ['photo','photography','photoshoot'], icon: '📷' },
+];
+
+function inferIcon(activity) {
+  if (!activity) return '📍';
+  const lower = activity.toLowerCase();
+  for (const { keys, icon } of ICON_MAP) {
+    if (keys.some(k => lower.includes(k))) return icon;
+  }
+  return '📍';
+}
+
+/* ── LOGIN ── */
 window.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(location.search);
   const code = params.get('code');
@@ -411,33 +643,28 @@ document.getElementById('code-input').addEventListener('keydown', e => {
 });
 
 function handleLogin() {
-  const raw = document.getElementById('code-input').value.trim();
-  tryCode(raw);
+  tryCode(document.getElementById('code-input').value.trim());
 }
 
 function tryCode(raw) {
-  // case-insensitive match
   const match = Object.entries(GROUPS).find(([k]) => k.toLowerCase() === raw.toLowerCase());
   if (!match) {
     document.getElementById('login-error').textContent = 'Code not recognised — try again.';
     return;
   }
-  const [, group] = match;
-  loadItinerary(group);
+  loadItinerary(match[1]);
 }
 
+/* ── LOAD ── */
 async function loadItinerary(group) {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app').style.display = 'block';
 
   const titleEl = document.getElementById('group-title');
-  // Bold name with italic accent on last word
   const parts = group.name.split(' ');
-  if (parts.length > 1) {
-    titleEl.innerHTML = parts.slice(0, -1).join(' ') + ' <span>' + parts.at(-1) + '</span>';
-  } else {
-    titleEl.innerHTML = '<span>' + group.name + '</span>';
-  }
+  titleEl.innerHTML = parts.length > 1
+    ? parts.slice(0,-1).join(' ') + ' <span>' + parts.at(-1) + '</span>'
+    : '<span>' + group.name + '</span>';
 
   const body = document.getElementById('itinerary-body');
   body.innerHTML = `<div class="state-msg"><div class="spinner"></div><p>Fetching your plans…</p></div>`;
@@ -451,9 +678,8 @@ async function loadItinerary(group) {
 
     const col = k => header.findIndex(h => h.trim().toUpperCase() === k.toUpperCase());
     const iDay = col('DAY'), iHour = col('HOUR'), iAct = col('ACTIVITY'),
-          iLoc = col('LOCATION'), iF1 = col('FIELD1'), iUrl = col('URL'), iStory = col('STORY');
+          iLoc  = col('LOCATION'), iF1 = col('FIELD1'), iUrl = col('URL'), iStory = col('STORY');
 
-    // Group by day
     const days = {};
     for (const row of rows) {
       const day = row[iDay] || '?';
@@ -461,76 +687,144 @@ async function loadItinerary(group) {
       days[day].push(row);
     }
 
-    // Render
     body.innerHTML = Object.entries(days).map(([day, items]) => `
       <div class="day-group">
         <div class="day-label">
           <div class="day-num">${String(day).padStart(2,'0')}</div>
           <div class="day-info">
             <div class="day-word">Day</div>
-            <div class="day-date">${dayLabel(day, items)}</div>
+            <div class="day-date">${dayLabel(day)}</div>
           </div>
         </div>
         <div class="day-rule"></div>
-        <div class="cards">
-          ${items.map(row => renderCard(row, iHour, iAct, iLoc, iF1, iUrl, iStory)).join('')}
+        <div class="timeline">
+          ${items.map(row => renderRow(row, iHour, iAct, iLoc, iF1, iUrl, iStory)).join('')}
         </div>
       </div>
     `).join('');
 
-  } catch (e) {
+  } catch(e) {
     body.innerHTML = `<div class="state-msg"><p>Couldn't load your itinerary.<br>Please check your connection.</p></div>`;
   }
 }
 
-function renderCard(row, iHour, iAct, iLoc, iF1, iUrl, iStory) {
-  const hour    = iHour  >= 0 ? (row[iHour]  || '') : '';
-  const act     = iAct   >= 0 ? (row[iAct]   || '') : '';
-  const loc     = iLoc   >= 0 ? (row[iLoc]   || '') : '';
-  const field1  = iF1    >= 0 ? (row[iF1]    || '') : '';
-  const url     = iUrl   >= 0 ? (row[iUrl]   || '') : '';
-  const story   = iStory >= 0 ? (row[iStory] || '') : '';
+/* ── RENDER ROW ── */
+function renderRow(row, iHour, iAct, iLoc, iF1, iUrl, iStory) {
+  const hour   = iHour  >= 0 ? (row[iHour]  || '') : '';
+  const act    = iAct   >= 0 ? (row[iAct]   || '') : '';
+  const loc    = iLoc   >= 0 ? (row[iLoc]   || '') : '';
+  const field1 = iF1    >= 0 ? (row[iF1]    || '') : '';
+  const url    = iUrl   >= 0 ? (row[iUrl]   || '') : '';
+  const story  = iStory >= 0 ? (row[iStory] || '') : '';
 
-  const timeStr = formatHour(hour);
+  const icon = inferIcon(act);
+  const { num, ampm } = formatHour(hour);
+  const hasDetail = !!(story || field1 || loc || url);
+  const data = encodeURIComponent(JSON.stringify({ hour, act, loc, field1, url, story, icon }));
 
   return `
-    <div class="card">
-      <div class="card-inner">
-        ${timeStr ? `
-          <div class="card-time">${timeStr}</div>
-          <div class="card-time-label">Time</div>
-        ` : ''}
-        ${act ? `<div class="card-activity">${act}</div>` : ''}
-        ${loc ? `
-          <div class="card-location">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            ${loc}
-          </div>
-        ` : ''}
-        ${field1 ? `<div class="card-field1">${field1}</div>` : ''}
-        ${story  ? `<div class="card-story">${story}</div>`  : ''}
-        ${url    ? `<a class="card-link" href="${url}" target="_blank" rel="noopener">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-          More info
-        </a>` : ''}
+    <div class="tl-row${hasDetail ? '' : ' no-detail'}"${hasDetail ? ` onclick="openDrawer('${data}')"` : ''}>
+      <div class="tl-time">
+        ${num ? `<span class="tl-time-num">${num}</span><span class="tl-time-ampm">${ampm}</span>` : ''}
       </div>
-    </div>
-  `;
+      <div class="tl-dot-col"><div class="tl-dot"></div></div>
+      <div class="tl-card">
+        <div class="tl-icon">${icon}</div>
+        <div class="tl-card-text">
+          <div class="tl-activity">${act || '—'}</div>
+          ${loc ? `<div class="tl-location">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span>${loc}</span>
+          </div>` : ''}
+        </div>
+        ${hasDetail ? `<svg class="tl-chevron" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>` : ''}
+      </div>
+    </div>`;
 }
 
+/* ── DRAWER ── */
+function openDrawer(dataEncoded) {
+  const d = JSON.parse(decodeURIComponent(dataEncoded));
+  document.getElementById('drawer-icon').textContent = d.icon;
+
+  const { num, ampm } = formatHour(d.hour);
+  document.getElementById('drawer-time').textContent = num ? `${num} ${ampm}` : '';
+  document.getElementById('drawer-title').textContent = d.act || '';
+
+  const body = document.getElementById('drawer-body');
+  let html = '';
+
+  if (d.story) html += `<div>
+    <div class="drawer-section-label">About this stop</div>
+    <div class="drawer-story">${d.story}</div>
+  </div>`;
+
+  if (d.field1) html += `<div>
+    <div class="drawer-section-label">Notes</div>
+    <div class="drawer-notes">${d.field1}</div>
+  </div>`;
+
+  if (d.loc) {
+    const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(d.loc)}`;
+    html += `<div>
+      <div class="drawer-section-label">Location</div>
+      <a class="drawer-maps-link" href="${mapsUrl}" target="_blank" rel="noopener">
+        <div class="drawer-maps-icon">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <span>Directions to ${d.loc}</span>
+      </a>
+    </div>`;
+  }
+
+  if (d.url) {
+    let label = d.url;
+    try { label = new URL(d.url).hostname.replace(/^www\./,''); } catch {}
+    html += `<div>
+      <div class="drawer-section-label">More info</div>
+      <a class="drawer-url-link" href="${d.url}" target="_blank" rel="noopener">
+        <div class="drawer-url-icon">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </div>
+        <span>${label}</span>
+      </a>
+    </div>`;
+  }
+
+  body.innerHTML = html || `<p style="color:var(--ink-muted);font-size:0.9rem;">No additional details.</p>`;
+
+  document.getElementById('drawer-overlay').classList.add('open');
+  document.getElementById('drawer').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeDrawer() {
+  document.getElementById('drawer-overlay').classList.remove('open');
+  document.getElementById('drawer').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+/* swipe down to close */
+let touchStartY = 0;
+document.getElementById('drawer').addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; }, { passive: true });
+document.getElementById('drawer').addEventListener('touchend', e => {
+  if (e.changedTouches[0].clientY - touchStartY > 60) closeDrawer();
+}, { passive: true });
+
+/* ── HELPERS ── */
 function formatHour(raw) {
-  if (!raw && raw !== 0) return '';
+  if (raw === '' || raw === null || raw === undefined) return { num: '', ampm: '' };
   const n = parseFloat(String(raw).replace(',','.'));
-  if (isNaN(n)) return raw;
+  if (isNaN(n)) return { num: raw, ampm: '' };
   const h = Math.floor(n);
   const m = Math.round((n - h) * 60);
   const hh = h % 12 || 12;
   const ampm = h < 12 ? 'am' : 'pm';
-  return m === 0 ? `${hh}${ampm}` : `${hh}:${String(m).padStart(2,'0')}${ampm}`;
+  const num = m === 0 ? `${hh}` : `${hh}:${String(m).padStart(2,'0')}`;
+  return { num, ampm };
 }
 
-function dayLabel(day, items) {
-  // Just show "Day N" label nicely — could enhance with actual dates if sheet provides them
+function dayLabel(day) {
   const ordinals = ['','First','Second','Third','Fourth','Fifth','Sixth','Seventh'];
   const n = parseInt(day);
   return ordinals[n] ? ordinals[n] + ' Day' : `Day ${day}`;
