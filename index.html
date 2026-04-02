@@ -61,7 +61,7 @@
     align-items: center;
     gap: 0.75rem;
     font-family: 'Jost', sans-serif;
-    font-size: 0.68rem;
+    font-size: 0.65rem;
     letter-spacing: 0.28em;
     text-transform: uppercase;
     color: #c9a96e;
@@ -87,7 +87,7 @@
 
   .login-byline {
     font-family: 'Jost', sans-serif;
-    font-size: 0.84rem;
+    font-size: 0.8rem;
     letter-spacing: 0.12em;
     color: rgba(245,240,232,0.45);
     text-align: center;
@@ -166,7 +166,7 @@
   }
 
   .header-eyebrow {
-    font-size: 0.68rem;
+    font-size: 0.65rem;
     letter-spacing: 0.18em;
     text-transform: uppercase;
     color: #5a5248;
@@ -198,9 +198,9 @@
 
   .day-num {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 2.9rem;
+    font-size: 2.4rem;
     font-weight: 300;
-    color: #b8ad9e;
+    color: var(--border);
     line-height: 1;
     user-select: none;
   }
@@ -208,18 +208,18 @@
   .day-info { flex: 1; }
 
   .day-word {
-    font-size: 0.68rem;
+    font-size: 0.65rem;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: #9e958a;
+    color: var(--ink-muted);
     font-weight: 500;
   }
 
   .day-date {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 1.15rem;
+    font-size: 1rem;
     font-weight: 400;
-    color: #3a3530;
+    color: var(--ink);
   }
 
   .day-rule {
@@ -245,9 +245,9 @@
 
   /* TIME — big and bold */
   .card-time {
-    font-family: 'Jost', sans-serif;
-    font-size: 2.31rem;
-    font-weight: 200;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.2rem;
+    font-weight: 300;
     color: var(--accent);
     line-height: 1;
     margin-bottom: 0.3rem;
@@ -256,7 +256,7 @@
   }
 
   .card-time-label {
-    font-size: 0.63rem;
+    font-size: 0.6rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--ink-muted);
@@ -266,7 +266,7 @@
 
   /* ACTIVITY — hero text */
   .card-activity {
-    font-family: 'Jost', sans-serif;
+    font-family: 'Cormorant Garamond', serif;
     font-size: clamp(1.4rem, 5vw, 1.8rem);
     font-weight: 300;
     color: var(--ink);
@@ -279,7 +279,7 @@
     display: flex;
     align-items: flex-start;
     gap: 0.35rem;
-    font-size: 0.86rem;
+    font-size: 0.82rem;
     color: var(--ink-muted);
     font-weight: 300;
     margin-bottom: 0.5rem;
@@ -294,7 +294,7 @@
 
   /* FIELD1 / notes */
   .card-field1 {
-    font-size: 0.89rem;
+    font-size: 0.85rem;
     color: var(--ink-muted);
     line-height: 1.6;
     font-weight: 300;
@@ -305,7 +305,7 @@
 
   /* STORY */
   .card-story {
-    font-size: 0.92rem;
+    font-size: 0.88rem;
     color: var(--ink-muted);
     line-height: 1.7;
     padding-top: 0.6rem;
@@ -324,7 +324,7 @@
     background: var(--accent-light);
     color: var(--accent);
     border-radius: 2rem;
-    font-size: 0.82rem;
+    font-size: 0.78rem;
     font-weight: 500;
     letter-spacing: 0.06em;
     text-decoration: none;
@@ -345,7 +345,7 @@
     min-height: 40vh;
     gap: 0.75rem;
     color: var(--ink-muted);
-    font-size: 0.945rem;
+    font-size: 0.9rem;
     padding: 2rem;
     text-align: center;
   }
@@ -368,7 +368,7 @@
 <!-- LOGIN -->
 <div id="login-screen">
   <p class="login-eyebrow">Guest Itinerary</p>
-  <h1 class="login-title">Welcome,<br>you're expected.</h1>
+  <h1 class="login-title">Welcome</h1>
   <p class="login-byline">relax and pull some weeds</p>
   <div class="login-box">
     <label for="code-input">Access Code</label>
