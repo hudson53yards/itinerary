@@ -18,7 +18,7 @@
     --day-text: #f7f4ef;
     --spine: #e0d9ce;
     --dot: #c8502a;
-    --dot-border: #f7f4ef;
+    --gold: #c9a96e;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -43,7 +43,6 @@
     position: relative;
     overflow: hidden;
   }
-
   #login-screen::before {
     content: '';
     position: absolute;
@@ -54,14 +53,12 @@
     opacity: 0.4;
     z-index: 0;
   }
-
   #login-screen > * { position: relative; z-index: 1; }
 
   .login-eyebrow {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    font-family: 'Jost', sans-serif;
     font-size: 0.65rem;
     letter-spacing: 0.28em;
     text-transform: uppercase;
@@ -80,7 +77,6 @@
     margin-bottom: 0.5rem;
     letter-spacing: 0.02em;
   }
-
   .login-byline {
     font-size: 0.8rem;
     letter-spacing: 0.12em;
@@ -88,7 +84,6 @@
     text-align: center;
     margin-bottom: 4rem;
   }
-
   .login-box {
     background: var(--surface);
     border-radius: 1rem;
@@ -96,7 +91,6 @@
     width: 100%;
     max-width: 360px;
   }
-
   .login-box label {
     display: block;
     font-size: 0.75rem;
@@ -106,7 +100,6 @@
     color: var(--ink-muted);
     margin-bottom: 0.5rem;
   }
-
   .login-box input {
     width: 100%;
     padding: 0.9rem 1rem;
@@ -121,7 +114,6 @@
     margin-bottom: 1rem;
   }
   .login-box input:focus { border-color: var(--accent); }
-
   .login-btn {
     width: 100%;
     padding: 1rem;
@@ -138,7 +130,6 @@
     transition: opacity 0.2s;
   }
   .login-btn:hover { opacity: 0.85; }
-
   .login-error {
     margin-top: 0.75rem;
     font-size: 0.85rem;
@@ -150,14 +141,20 @@
   /* ── APP ── */
   #app { display: none; }
 
+  /* ── HEADER ── */
   .app-header {
     background: var(--day-bg);
-    padding: 1.5rem 1.25rem 1.25rem;
+    padding: 1.25rem 1.25rem 0;
     position: sticky;
     top: 0;
     z-index: 100;
   }
-
+  .header-top {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding-bottom: 0.85rem;
+  }
   .header-eyebrow {
     font-size: 0.65rem;
     letter-spacing: 0.18em;
@@ -165,73 +162,82 @@
     color: #5a5248;
     margin-bottom: 0.15rem;
   }
-
   .header-name {
     font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(1.6rem, 6vw, 2.4rem);
+    font-size: clamp(1.5rem, 5.5vw, 2.2rem);
     font-weight: 600;
     color: var(--day-text);
     line-height: 1.1;
   }
   .header-name span { color: var(--accent); font-style: italic; }
 
-  /* ── DAY SECTION ── */
-  .day-group { margin-bottom: 0.25rem; }
-
-  .day-label {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 1.5rem 1.25rem 0.75rem;
-  }
-
-  .day-num {
+  /* live clock */
+  .header-clock {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 2.4rem;
+    font-size: 1.1rem;
     font-weight: 300;
-    color: var(--border);
-    line-height: 1;
-    user-select: none;
+    color: #5a5248;
+    letter-spacing: 0.03em;
+    padding-bottom: 0.1rem;
+    flex-shrink: 0;
   }
 
-  .day-info { flex: 1; }
+  /* ── DAY TABS ── */
+  .day-tabs {
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-bottom: 0;
+  }
+  .day-tabs::-webkit-scrollbar { display: none; }
 
-  .day-word {
-    font-size: 0.65rem;
-    letter-spacing: 0.18em;
+  .day-tab {
+    flex-shrink: 0;
+    padding: 0.65rem 1.1rem 0.6rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--ink-muted);
     font-weight: 500;
+    color: #4a4440;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: color 0.18s, border-color 0.18s;
+    white-space: nowrap;
+    position: relative;
+  }
+  .day-tab:hover { color: #8a8078; }
+  .day-tab.active {
+    color: var(--day-text);
+    border-bottom-color: var(--accent);
+  }
+  /* today indicator dot on tab */
+  .day-tab.is-today::after {
+    content: '';
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--gold);
   }
 
-  .day-date {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1rem;
-    font-weight: 400;
-    color: var(--ink);
-  }
-
-  .day-rule {
-    height: 1px;
-    background: var(--border);
-    margin: 0 1.25rem;
-  }
+  /* ── TIMELINE PANEL ── */
+  .day-panel { display: none; padding-bottom: 2.5rem; }
+  .day-panel.active { display: block; }
 
   /* ── TIMELINE ── */
-  /* Layout: [TIME 56px] [SPINE ZONE 32px] [CARD flex] [right pad] */
   .timeline {
     position: relative;
     padding: 0.75rem 1rem 0.5rem 0;
   }
-
-  /* The vertical spine sits in the spine zone */
   .timeline::before {
     content: '';
     position: absolute;
-    top: 0;
-    bottom: 0;
-    /* time col = 56px, left outer pad = 1.25rem ≈ 20px, spine centered in 32px zone → 20 + 56 + 16 = 92px */
-    left: 92px;
+    top: 0; bottom: 0;
+    left: 92px; /* 20px outer + 56px time col + 16px (half of 32px dot col) */
     width: 2px;
     background: var(--spine);
     z-index: 0;
@@ -244,6 +250,17 @@
     margin-bottom: 0.75rem;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
+    transition: opacity 0.3s, filter 0.3s;
+  }
+  .tl-row.no-detail { cursor: default; }
+  .tl-row.no-detail:active .tl-card { transform: none; box-shadow: none; }
+  .tl-row.no-detail:active .tl-dot { transform: none; }
+
+  /* PAST state */
+  .tl-row.is-past {
+    opacity: 0.38;
+    filter: saturate(0.15);
+    pointer-events: none;
   }
 
   /* TIME column */
@@ -255,7 +272,6 @@
     text-align: right;
     flex-shrink: 0;
   }
-
   .tl-time-num {
     font-family: 'Cormorant Garamond', serif;
     font-size: 1.05rem;
@@ -264,7 +280,6 @@
     line-height: 1;
     display: block;
   }
-
   .tl-time-ampm {
     font-size: 0.6rem;
     letter-spacing: 0.1em;
@@ -273,7 +288,7 @@
     margin-top: 0.05rem;
   }
 
-  /* DOT column — 32px wide, spine at center (16px from left) */
+  /* DOT column */
   .tl-dot-col {
     width: 32px;
     min-width: 32px;
@@ -284,7 +299,6 @@
     position: relative;
     z-index: 1;
   }
-
   .tl-dot {
     width: 11px;
     height: 11px;
@@ -294,8 +308,18 @@
     box-shadow: 0 0 0 2px var(--dot);
     transition: transform 0.18s;
   }
+  .tl-row:not(.no-detail):active .tl-dot { transform: scale(1.35); }
 
-  .tl-row:active .tl-dot { transform: scale(1.35); }
+  /* Up-next dot — gold pulsing */
+  .tl-row.is-upnext .tl-dot {
+    background: var(--gold);
+    box-shadow: 0 0 0 2px var(--gold);
+    animation: pulse-dot 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse-dot {
+    0%, 100% { box-shadow: 0 0 0 2px var(--gold); }
+    50%       { box-shadow: 0 0 0 5px rgba(201,169,110,0.25), 0 0 0 2px var(--gold); }
+  }
 
   /* CARD */
   .tl-card {
@@ -310,25 +334,27 @@
     transition: box-shadow 0.2s, transform 0.15s;
     min-width: 0;
   }
-
-  .tl-row:active .tl-card {
+  .tl-row:not(.no-detail):active .tl-card {
     box-shadow: 0 4px 18px rgba(0,0,0,0.1);
     transform: scale(0.983);
+  }
+  /* up-next card highlight */
+  .tl-row.is-upnext .tl-card {
+    border-color: rgba(201,169,110,0.45);
+    box-shadow: 0 2px 12px rgba(201,169,110,0.12);
   }
 
   /* ICON */
   .tl-icon {
-    width: 36px;
-    height: 36px;
+    width: 36px; height: 36px;
     border-radius: 0.5rem;
     background: var(--accent-light);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
     font-size: 1.15rem;
     line-height: 1;
   }
+  .tl-row.is-upnext .tl-icon { background: rgba(201,169,110,0.15); }
 
   .tl-card-text { flex: 1; min-width: 0; }
 
@@ -353,26 +379,37 @@
     margin-top: 0.18rem;
     overflow: hidden;
   }
-
-  .tl-location span {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
+  .tl-location span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .tl-location svg { flex-shrink: 0; opacity: 0.55; }
+
+  /* UP NEXT badge */
+  .upnext-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-top: 0.3rem;
+  }
+  .upnext-badge-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--gold);
+    animation: pulse-dot 1.8s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+  .upnext-badge-text {
+    font-size: 0.63rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 500;
+    color: var(--gold);
+  }
 
   .tl-chevron {
     color: #d4ccc3;
     flex-shrink: 0;
     transition: color 0.2s;
   }
-  .tl-row:active .tl-chevron { color: var(--accent); }
-
-  /* no-detail rows */
-  .tl-row.no-detail { cursor: default; }
-  .tl-row.no-detail:active .tl-card { transform: none; box-shadow: none; }
-  .tl-row.no-detail:active .tl-dot { transform: none; }
+  .tl-row:not(.no-detail):active .tl-chevron { color: var(--accent); }
 
   /* ── BOTTOM DRAWER ── */
   .drawer-overlay {
@@ -407,14 +444,12 @@
     border-radius: 2px;
     margin: 0.75rem auto 0;
   }
-
   .drawer-header {
     display: flex;
     align-items: flex-start;
     gap: 1rem;
     padding: 1.1rem 1.5rem 1rem;
   }
-
   .drawer-icon {
     width: 46px; height: 46px;
     border-radius: 0.75rem;
@@ -423,9 +458,7 @@
     font-size: 1.5rem;
     flex-shrink: 0;
   }
-
   .drawer-title-group { flex: 1; min-width: 0; }
-
   .drawer-time {
     font-size: 0.7rem;
     letter-spacing: 0.14em;
@@ -434,7 +467,6 @@
     font-weight: 500;
     margin-bottom: 0.18rem;
   }
-
   .drawer-title {
     font-family: 'Cormorant Garamond', serif;
     font-size: 1.55rem;
@@ -442,16 +474,11 @@
     color: var(--ink);
     line-height: 1.15;
   }
-
   .drawer-divider { height: 1px; background: var(--border); margin: 0 1.5rem; }
-
   .drawer-body {
     padding: 1.2rem 1.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.2rem;
+    display: flex; flex-direction: column; gap: 1.2rem;
   }
-
   .drawer-section-label {
     font-size: 0.63rem;
     letter-spacing: 0.16em;
@@ -460,7 +487,6 @@
     font-weight: 500;
     margin-bottom: 0.4rem;
   }
-
   .drawer-story {
     font-family: 'Cormorant Garamond', serif;
     font-size: 1.05rem;
@@ -468,14 +494,12 @@
     line-height: 1.75;
     font-style: italic;
   }
-
   .drawer-notes {
     font-size: 0.88rem;
     color: var(--ink-muted);
     line-height: 1.65;
     font-weight: 300;
   }
-
   .drawer-maps-link {
     display: flex;
     align-items: center;
@@ -490,7 +514,6 @@
     transition: background 0.18s;
   }
   .drawer-maps-link:hover { background: #c8e6c9; }
-
   .drawer-maps-icon {
     width: 28px; height: 28px;
     background: #2e7d32;
@@ -498,7 +521,6 @@
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
   }
-
   .drawer-url-link {
     display: flex;
     align-items: center;
@@ -513,7 +535,6 @@
     transition: background 0.18s;
   }
   .drawer-url-link:hover { background: #eedad2; }
-
   .drawer-url-icon {
     width: 28px; height: 28px;
     background: var(--accent);
@@ -522,7 +543,7 @@
     flex-shrink: 0;
   }
 
-  /* ── LOADING ── */
+  /* ── LOADING / ERROR ── */
   .state-msg {
     display: flex;
     flex-direction: column;
@@ -535,7 +556,6 @@
     padding: 2rem;
     text-align: center;
   }
-
   .spinner {
     width: 2rem; height: 2rem;
     border: 3px solid var(--border);
@@ -543,7 +563,6 @@
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
   }
-
   @keyframes spin { to { transform: rotate(360deg); } }
 </style>
 </head>
@@ -552,7 +571,7 @@
 <!-- LOGIN -->
 <div id="login-screen">
   <p class="login-eyebrow">Guest Itinerary</p>
-  <h1 class="login-title">Welcomer</h1>
+  <h1 class="login-title">Welcome</h1>
   <p class="login-byline">relax and pull some weeds</p>
   <div class="login-box">
     <label for="code-input">Access Code</label>
@@ -565,15 +584,20 @@
 <!-- APP -->
 <div id="app">
   <header class="app-header">
-    <p class="header-eyebrow">Your itinerary</p>
-    <h1 class="header-name" id="group-title">Loading…</h1>
+    <div class="header-top">
+      <div>
+        <p class="header-eyebrow">Your itinerary</p>
+        <h1 class="header-name" id="group-title">Loading…</h1>
+      </div>
+      <div class="header-clock" id="live-clock"></div>
+    </div>
+    <div class="day-tabs" id="day-tabs"></div>
   </header>
   <main id="itinerary-body"></main>
 </div>
 
 <!-- DRAWER OVERLAY -->
 <div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
-
 <!-- BOTTOM DRAWER -->
 <div class="drawer" id="drawer">
   <div class="drawer-handle"></div>
@@ -589,6 +613,9 @@
 </div>
 
 <script>
+/* ─────────────────────────────────────────
+   CONFIG
+───────────────────────────────────────── */
 const SHEET_ID = '1Y0qgm9aov7qaQOcdE3khXit85loGs9FmU2tvsl0ZCXU';
 const API_KEY  = 'AIzaSyBpvELhAkbUZQXwjhz65S28tRX4iNHIdhk';
 
@@ -600,7 +627,9 @@ const GROUPS = {
   'GROUP5': { tab: 'group5',     name: 'Group 5' },
 };
 
-/* ── ICON INFERENCE ── */
+/* ─────────────────────────────────────────
+   ICON INFERENCE
+───────────────────────────────────────── */
 const ICON_MAP = [
   { keys: ['breakfast','brunch','café','cafe','coffee','bakery','pastry','croissant'], icon: '☕' },
   { keys: ['lunch','dinner','restaurant','bistro','tavern','pub','bar','grill','tasting','wine','beer','cocktail','drinks','eat','meal'], icon: '🍽️' },
@@ -631,7 +660,16 @@ function inferIcon(activity) {
   return '📍';
 }
 
-/* ── LOGIN ── */
+/* ─────────────────────────────────────────
+   STATE
+───────────────────────────────────────── */
+let appDays = [];         // [{ dayNum, date, items }] sorted by dayNum
+let activeDayIdx = 0;
+let clockTimer = null;
+
+/* ─────────────────────────────────────────
+   LOGIN
+───────────────────────────────────────── */
 window.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(location.search);
   const code = params.get('code');
@@ -642,9 +680,7 @@ document.getElementById('code-input').addEventListener('keydown', e => {
   if (e.key === 'Enter') handleLogin();
 });
 
-function handleLogin() {
-  tryCode(document.getElementById('code-input').value.trim());
-}
+function handleLogin() { tryCode(document.getElementById('code-input').value.trim()); }
 
 function tryCode(raw) {
   const match = Object.entries(GROUPS).find(([k]) => k.toLowerCase() === raw.toLowerCase());
@@ -655,19 +691,22 @@ function tryCode(raw) {
   loadItinerary(match[1]);
 }
 
-/* ── LOAD ── */
+/* ─────────────────────────────────────────
+   LOAD ITINERARY
+───────────────────────────────────────── */
 async function loadItinerary(group) {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app').style.display = 'block';
 
+  // Group title
   const titleEl = document.getElementById('group-title');
   const parts = group.name.split(' ');
   titleEl.innerHTML = parts.length > 1
     ? parts.slice(0,-1).join(' ') + ' <span>' + parts.at(-1) + '</span>'
     : '<span>' + group.name + '</span>';
 
-  const body = document.getElementById('itinerary-body');
-  body.innerHTML = `<div class="state-msg"><div class="spinner"></div><p>Fetching your plans…</p></div>`;
+  document.getElementById('itinerary-body').innerHTML =
+    `<div class="state-msg"><div class="spinner"></div><p>Fetching your plans…</p></div>`;
 
   try {
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(group.tab)}?key=${API_KEY}`;
@@ -677,38 +716,264 @@ async function loadItinerary(group) {
     const [header, ...rows] = json.values || [];
 
     const col = k => header.findIndex(h => h.trim().toUpperCase() === k.toUpperCase());
-    const iDay = col('DAY'), iHour = col('HOUR'), iAct = col('ACTIVITY'),
-          iLoc  = col('LOCATION'), iF1 = col('FIELD1'), iUrl = col('URL'), iStory = col('STORY');
+    const iDay  = col('DAY'),   iHour = col('HOUR'),  iAct  = col('ACTIVITY');
+    const iLoc  = col('LOCATION'), iF1 = col('FIELD1'), iUrl = col('URL');
+    const iStory = col('STORY'), iDate = col('DATE');
 
-    const days = {};
+    // Build day map
+    const dayMap = {};
     for (const row of rows) {
-      const day = row[iDay] || '?';
-      if (!days[day]) days[day] = [];
-      days[day].push(row);
+      const dayKey = row[iDay] || '?';
+      if (!dayMap[dayKey]) {
+        // Grab DATE from first row of this day that has one
+        const dateRaw = iDate >= 0 ? (row[iDate] || '') : '';
+        dayMap[dayKey] = { dayNum: parseInt(dayKey) || 0, dateRaw, items: [] };
+      }
+      // Update dateRaw if empty and this row has it
+      if (!dayMap[dayKey].dateRaw && iDate >= 0 && row[iDate]) {
+        dayMap[dayKey].dateRaw = row[iDate];
+      }
+      dayMap[dayKey].items.push(row);
     }
 
-    body.innerHTML = Object.entries(days).map(([day, items]) => `
-      <div class="day-group">
-        <div class="day-label">
-          <div class="day-num">${String(day).padStart(2,'0')}</div>
-          <div class="day-info">
-            <div class="day-word">Day</div>
-            <div class="day-date">${dayLabel(day)}</div>
-          </div>
-        </div>
-        <div class="day-rule"></div>
-        <div class="timeline">
-          ${items.map(row => renderRow(row, iHour, iAct, iLoc, iF1, iUrl, iStory)).join('')}
-        </div>
-      </div>
-    `).join('');
+    // Sort by day number
+    appDays = Object.values(dayMap).sort((a,b) => a.dayNum - b.dayNum);
+
+    // Parse dates for each day  
+    appDays.forEach(d => { d.date = parseSheetDate(d.dateRaw); });
+
+    // Determine active day based on today
+    activeDayIdx = resolveActiveDay();
+
+    // Render tabs + panels
+    renderApp(iHour, iAct, iLoc, iF1, iUrl, iStory);
+
+    // Start live clock
+    updateClock();
+    if (clockTimer) clearInterval(clockTimer);
+    clockTimer = setInterval(() => {
+      updateClock();
+      refreshActivityStates();
+    }, 60000);
 
   } catch(e) {
-    body.innerHTML = `<div class="state-msg"><p>Couldn't load your itinerary.<br>Please check your connection.</p></div>`;
+    document.getElementById('itinerary-body').innerHTML =
+      `<div class="state-msg"><p>Couldn't load your itinerary.<br>Please check your connection.</p></div>`;
   }
 }
 
-/* ── RENDER ROW ── */
+/* ─────────────────────────────────────────
+   DATE RESOLUTION
+   Sheet DATE column may be: "April 2", "2 April", "2025-04-02", "Apr 2", etc.
+───────────────────────────────────────── */
+function parseSheetDate(raw) {
+  if (!raw) return null;
+  // Try native Date parse (works for ISO and "Month D, YYYY" etc.)
+  const attempt = new Date(raw);
+  if (!isNaN(attempt)) return attempt;
+
+  // Try "D Month" or "Month D" without year — attach current/next year
+  const months = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+  const s = String(raw).trim().toLowerCase();
+  let d, m;
+
+  // "2 april" or "april 2"
+  const re1 = /^(\d{1,2})\s+([a-z]+)$/;
+  const re2 = /^([a-z]+)\s+(\d{1,2})$/;
+  let match;
+
+  if ((match = re1.exec(s))) {
+    d = parseInt(match[1]);
+    m = months.findIndex(x => match[2].startsWith(x));
+  } else if ((match = re2.exec(s))) {
+    m = months.findIndex(x => match[1].startsWith(x));
+    d = parseInt(match[2]);
+  }
+
+  if (d && m >= 0) {
+    const year = new Date().getFullYear();
+    return new Date(year, m, d);
+  }
+  return null;
+}
+
+function todayMidnight() {
+  const t = new Date();
+  return new Date(t.getFullYear(), t.getMonth(), t.getDate());
+}
+
+function isSameDay(a, b) {
+  if (!a || !b) return false;
+  return a.getFullYear() === b.getFullYear() &&
+         a.getMonth()    === b.getMonth()    &&
+         a.getDate()     === b.getDate();
+}
+
+function resolveActiveDay() {
+  const today = todayMidnight();
+  // Find day that matches today
+  const todayIdx = appDays.findIndex(d => d.date && isSameDay(d.date, today));
+  if (todayIdx >= 0) return todayIdx;
+
+  // All days have dates?
+  const daysWithDates = appDays.filter(d => d.date);
+  if (daysWithDates.length === 0) return 0; // no dates in sheet → default Day 1
+
+  const first = daysWithDates[0].date;
+  const last  = daysWithDates[daysWithDates.length - 1].date;
+
+  if (today < first) return 0;                  // before trip → Day 1
+  if (today > last)  return appDays.length - 1; // after trip → last day
+  return 0;
+}
+
+/* ─────────────────────────────────────────
+   RENDER APP
+───────────────────────────────────────── */
+function renderApp(iHour, iAct, iLoc, iF1, iUrl, iStory) {
+  const today = todayMidnight();
+
+  // Tabs
+  const tabsEl = document.getElementById('day-tabs');
+  tabsEl.innerHTML = appDays.map((d, i) => {
+    const isToday = d.date && isSameDay(d.date, today);
+    return `<div class="day-tab${i === activeDayIdx ? ' active' : ''}${isToday ? ' is-today' : ''}"
+                 onclick="switchDay(${i})">Day ${d.dayNum}</div>`;
+  }).join('');
+
+  // Panels
+  const body = document.getElementById('itinerary-body');
+  body.innerHTML = appDays.map((d, i) => `
+    <div class="day-panel${i === activeDayIdx ? ' active' : ''}" id="panel-${i}">
+      <div class="timeline" id="timeline-${i}">
+        ${d.items.map(row => renderRow(row, iHour, iAct, iLoc, iF1, iUrl, iStory)).join('')}
+      </div>
+    </div>
+  `).join('');
+
+  // Store column indices for later re-renders
+  appDays._cols = { iHour, iAct, iLoc, iF1, iUrl, iStory };
+
+  // Apply time states
+  refreshActivityStates();
+}
+
+/* ─────────────────────────────────────────
+   DAY SWITCHING
+───────────────────────────────────────── */
+function switchDay(idx) {
+  // Remove active from old
+  document.querySelectorAll('.day-tab')[activeDayIdx]?.classList.remove('active');
+  document.getElementById(`panel-${activeDayIdx}`)?.classList.remove('active');
+
+  activeDayIdx = idx;
+
+  document.querySelectorAll('.day-tab')[idx]?.classList.add('active');
+  document.getElementById(`panel-${idx}`)?.classList.add('active');
+}
+
+/* ─────────────────────────────────────────
+   TIME-AWARE ACTIVITY STATES
+   Called on load and every 60 s
+───────────────────────────────────────── */
+function refreshActivityStates() {
+  const today = todayMidnight();
+  const nowMins = nowInMinutes(); // minutes since midnight
+
+  appDays.forEach((d, dayIdx) => {
+    const rows = document.querySelectorAll(`#timeline-${dayIdx} .tl-row`);
+    if (!rows.length) return;
+
+    const isToday  = d.date && isSameDay(d.date, today);
+    const isPast   = d.date && d.date < today;
+    const isFuture = !isPast && !isToday;
+
+    if (isPast) {
+      // Entire day greyed out
+      rows.forEach(r => {
+        r.classList.add('is-past');
+        r.classList.remove('is-upnext');
+        clearUpNextBadge(r);
+      });
+      return;
+    }
+
+    if (isFuture) {
+      rows.forEach(r => {
+        r.classList.remove('is-past', 'is-upnext');
+        clearUpNextBadge(r);
+      });
+      return;
+    }
+
+    // TODAY — evaluate each row
+    let upNextSet = false;
+    rows.forEach(r => {
+      const hourRaw = r.dataset.hour;
+      const rowMins = hourToMinutes(hourRaw);
+
+      if (rowMins !== null && rowMins <= nowMins) {
+        // Past activity on today
+        r.classList.add('is-past');
+        r.classList.remove('is-upnext');
+        clearUpNextBadge(r);
+      } else {
+        // Future activity today
+        r.classList.remove('is-past');
+        if (!upNextSet) {
+          // First future activity = "up next"
+          r.classList.add('is-upnext');
+          addUpNextBadge(r);
+          upNextSet = true;
+        } else {
+          r.classList.remove('is-upnext');
+          clearUpNextBadge(r);
+        }
+      }
+    });
+  });
+}
+
+function nowInMinutes() {
+  const n = new Date();
+  return n.getHours() * 60 + n.getMinutes();
+}
+
+function hourToMinutes(raw) {
+  if (raw === '' || raw === null || raw === undefined) return null;
+  const n = parseFloat(String(raw).replace(',','.'));
+  if (isNaN(n)) return null;
+  return Math.round(n * 60);
+}
+
+function addUpNextBadge(row) {
+  const textEl = row.querySelector('.tl-card-text');
+  if (!textEl) return;
+  if (textEl.querySelector('.upnext-badge')) return; // already there
+  const badge = document.createElement('div');
+  badge.className = 'upnext-badge';
+  badge.innerHTML = `<div class="upnext-badge-dot"></div><span class="upnext-badge-text">Up next</span>`;
+  textEl.appendChild(badge);
+}
+
+function clearUpNextBadge(row) {
+  row.querySelector('.upnext-badge')?.remove();
+}
+
+/* ─────────────────────────────────────────
+   LIVE CLOCK
+───────────────────────────────────────── */
+function updateClock() {
+  const n = new Date();
+  const h = n.getHours() % 12 || 12;
+  const m = String(n.getMinutes()).padStart(2,'0');
+  const ampm = n.getHours() < 12 ? 'am' : 'pm';
+  document.getElementById('live-clock').textContent = `${h}:${m} ${ampm}`;
+}
+
+/* ─────────────────────────────────────────
+   RENDER ROW
+───────────────────────────────────────── */
 function renderRow(row, iHour, iAct, iLoc, iF1, iUrl, iStory) {
   const hour   = iHour  >= 0 ? (row[iHour]  || '') : '';
   const act    = iAct   >= 0 ? (row[iAct]   || '') : '';
@@ -723,7 +988,9 @@ function renderRow(row, iHour, iAct, iLoc, iF1, iUrl, iStory) {
   const data = encodeURIComponent(JSON.stringify({ hour, act, loc, field1, url, story, icon }));
 
   return `
-    <div class="tl-row${hasDetail ? '' : ' no-detail'}"${hasDetail ? ` onclick="openDrawer('${data}')"` : ''}>
+    <div class="tl-row${hasDetail ? '' : ' no-detail'}"
+         data-hour="${hour}"
+         ${hasDetail ? `onclick="openDrawer('${data}')"` : ''}>
       <div class="tl-time">
         ${num ? `<span class="tl-time-num">${num}</span><span class="tl-time-ampm">${ampm}</span>` : ''}
       </div>
@@ -742,7 +1009,9 @@ function renderRow(row, iHour, iAct, iLoc, iF1, iUrl, iStory) {
     </div>`;
 }
 
-/* ── DRAWER ── */
+/* ─────────────────────────────────────────
+   DRAWER
+───────────────────────────────────────── */
 function openDrawer(dataEncoded) {
   const d = JSON.parse(decodeURIComponent(dataEncoded));
   document.getElementById('drawer-icon').textContent = d.icon;
@@ -804,14 +1073,15 @@ function closeDrawer() {
   document.body.style.overflow = '';
 }
 
-/* swipe down to close */
 let touchStartY = 0;
 document.getElementById('drawer').addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; }, { passive: true });
 document.getElementById('drawer').addEventListener('touchend', e => {
   if (e.changedTouches[0].clientY - touchStartY > 60) closeDrawer();
 }, { passive: true });
 
-/* ── HELPERS ── */
+/* ─────────────────────────────────────────
+   HELPERS
+───────────────────────────────────────── */
 function formatHour(raw) {
   if (raw === '' || raw === null || raw === undefined) return { num: '', ampm: '' };
   const n = parseFloat(String(raw).replace(',','.'));
@@ -822,12 +1092,6 @@ function formatHour(raw) {
   const ampm = h < 12 ? 'am' : 'pm';
   const num = m === 0 ? `${hh}` : `${hh}:${String(m).padStart(2,'0')}`;
   return { num, ampm };
-}
-
-function dayLabel(day) {
-  const ordinals = ['','First','Second','Third','Fourth','Fifth','Sixth','Seventh'];
-  const n = parseInt(day);
-  return ordinals[n] ? ordinals[n] + ' Day' : `Day ${day}`;
 }
 </script>
 </body>
