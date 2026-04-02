@@ -750,7 +750,7 @@ async function loadItinerary(group) {
     const [header, ...rows] = json.values || [];
 
     const col = k => header.findIndex(h => h.trim().toUpperCase() === k.toUpperCase());
-    const iDay  = col('DAY'),   iHour = col('HOUR'),  iAct  = col('ACTIVITY');
+    const iDay  = col('DAY'),   iHour = col('HOUR') >= 0 ? col('HOUR') : col('TIME'),  iAct  = col('ACTIVITY');
     const iLoc  = col('LOCATION'), iF1 = col('FIELD1'), iUrl = col('URL');
     const iStory = col('STORY'), iDate = col('DATE');
 
@@ -802,32 +802,43 @@ async function loadItinerary(group) {
 ───────────────────────────────────────── */
 function parseSheetDate(raw) {
   if (!raw) return null;
-  // Try native Date parse (works for ISO and "Month D, YYYY" etc.)
-  const attempt = new Date(raw);
-  if (!isNaN(attempt)) return attempt;
 
-  // Try "D Month" or "Month D" without year — attach current/next year
+  const s = String(raw).trim();
+
+  // Format: "2026-04-02, 8:00 PM" or "2026-04-02, 20:00" — extract date part only
+  const isoWithTime = /^(\d{4})-(\d{2})-(\d{2})[,\s]/.exec(s);
+  if (isoWithTime) {
+    return new Date(parseInt(isoWithTime[1]), parseInt(isoWithTime[2]) - 1, parseInt(isoWithTime[3]));
+  }
+
+  // Plain ISO: "2026-04-02"
+  const iso = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
+  if (iso) {
+    return new Date(parseInt(iso[1]), parseInt(iso[2]) - 1, parseInt(iso[3]));
+  }
+
+  // "April 2" or "2 April" (with optional year)
   const months = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
-  const s = String(raw).trim().toLowerCase();
-  let d, m;
+  const sl = s.toLowerCase();
+  const re1 = /^(\d{1,2})\s+([a-z]+)/;
+  const re2 = /^([a-z]+)\s+(\d{1,2})/;
+  let match, d, m;
 
-  // "2 april" or "april 2"
-  const re1 = /^(\d{1,2})\s+([a-z]+)$/;
-  const re2 = /^([a-z]+)\s+(\d{1,2})$/;
-  let match;
-
-  if ((match = re1.exec(s))) {
+  if ((match = re1.exec(sl))) {
     d = parseInt(match[1]);
     m = months.findIndex(x => match[2].startsWith(x));
-  } else if ((match = re2.exec(s))) {
+  } else if ((match = re2.exec(sl))) {
     m = months.findIndex(x => match[1].startsWith(x));
     d = parseInt(match[2]);
   }
 
   if (d && m >= 0) {
-    const year = new Date().getFullYear();
-    return new Date(year, m, d);
+    return new Date(new Date().getFullYear(), m, d);
   }
+
+  // Last resort native parse
+  const attempt = new Date(s);
+  if (!isNaN(attempt)) return attempt;
   return null;
 }
 
@@ -919,7 +930,7 @@ function refreshActivityStates() {
     if (!rows.length) return;
 
     const isToday  = d.date && isSameDay(d.date, today);
-    const isPast   = d.date && d.date < today;
+    const isPast   = d.date && !isToday && d.date.getTime() < today.getTime();
     const isFuture = !isPast && !isToday;
 
     if (isPast) {
@@ -971,13 +982,6 @@ function refreshActivityStates() {
 function nowInMinutes() {
   const n = new Date();
   return n.getHours() * 60 + n.getMinutes();
-}
-
-function hourToMinutes(raw) {
-  if (raw === '' || raw === null || raw === undefined) return null;
-  const n = parseFloat(String(raw).replace(',','.'));
-  if (isNaN(n)) return null;
-  return Math.round(n * 60);
 }
 
 function addUpNextBadge(row) {
@@ -1116,16 +1120,56 @@ document.getElementById('drawer').addEventListener('touchend', e => {
 /* ─────────────────────────────────────────
    HELPERS
 ───────────────────────────────────────── */
+
+// Parse a time string into { hours24, minutes } — handles:
+//   decimal:  9.5  → 9h 30m
+//   12-hour:  "8:00 PM", "8:00 pm", "8 PM"
+//   24-hour:  "20:00", "09:30"
+function parseTimeRaw(raw) {
+  if (raw === '' || raw === null || raw === undefined) return null;
+  const s = String(raw).trim();
+
+  // "8:00 PM" / "8 PM" / "8:30 am"
+  const ampmMatch = s.match(/^(\d{1,2})(?::(\d{2}))?\s*(am|pm)$/i);
+  if (ampmMatch) {
+    let h = parseInt(ampmMatch[1]);
+    const m = parseInt(ampmMatch[2] || '0');
+    const isPm = ampmMatch[3].toLowerCase() === 'pm';
+    if (isPm && h !== 12) h += 12;
+    if (!isPm && h === 12) h = 0;
+    return { hours24: h, minutes: m };
+  }
+
+  // "20:00" / "09:30" — 24-hour with colon
+  const colonMatch = s.match(/^(\d{1,2}):(\d{2})$/);
+  if (colonMatch) {
+    return { hours24: parseInt(colonMatch[1]), minutes: parseInt(colonMatch[2]) };
+  }
+
+  // Decimal: 9.5 → 9h 30m
+  const n = parseFloat(s.replace(',', '.'));
+  if (!isNaN(n)) {
+    const h = Math.floor(n);
+    const m = Math.round((n - h) * 60);
+    return { hours24: h, minutes: m };
+  }
+
+  return null;
+}
+
 function formatHour(raw) {
-  if (raw === '' || raw === null || raw === undefined) return { num: '', ampm: '' };
-  const n = parseFloat(String(raw).replace(',','.'));
-  if (isNaN(n)) return { num: raw, ampm: '' };
-  const h = Math.floor(n);
-  const m = Math.round((n - h) * 60);
-  const hh = h % 12 || 12;
-  const ampm = h < 12 ? 'am' : 'pm';
-  const num = m === 0 ? `${hh}` : `${hh}:${String(m).padStart(2,'0')}`;
+  const t = parseTimeRaw(raw);
+  if (!t) return { num: '', ampm: '' };
+  const hh = t.hours24 % 12 || 12;
+  const ampm = t.hours24 < 12 ? 'am' : 'pm';
+  const num = t.minutes === 0 ? `${hh}` : `${hh}:${String(t.minutes).padStart(2,'0')}`;
   return { num, ampm };
+}
+
+function hourToMinutes(raw) {
+  const t = parseTimeRaw(raw);
+  if (!t) return null;
+  return t.hours24 * 60 + t.minutes;
 }
 </script>
 </body>
