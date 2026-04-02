@@ -2,1083 +2,539 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Your Itinerary</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Visit</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0f0e0c;
-    --card: #161411;
-    --card2: #1c1a16;
-    --gold: #c9a96e;
-    --gold-dim: rgba(201,169,110,0.18);
-    --gold-glow: rgba(201,169,110,0.35);
-    --text: #f0ead8;
-    --text-dim: rgba(240,234,216,0.55);
-    --text-faint: rgba(240,234,216,0.28);
-    --spine: rgba(201,169,110,0.22);
-    --radius: 14px;
-    --drawer-radius: 20px;
+    --bg: #f7f4ef;
+    --surface: #ffffff;
+    --ink: #1a1612;
+    --ink-muted: #7a7268;
+    --accent: #c8502a;
+    --accent-light: #f5ede8;
+    --border: #e8e2d9;
+    --day-bg: #1a1612;
+    --day-text: #f7f4ef;
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-  html, body {
+  body {
     background: var(--bg);
-    color: var(--text);
-    font-family: 'Inter', sans-serif;
-    font-size: 15px;
-    min-height: 100dvh;
-    overflow-x: hidden;
+    color: var(--ink);
+    font-family: 'Jost', sans-serif;
+    min-height: 100vh;
   }
 
   /* ── LOGIN ── */
   #login-screen {
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 100dvh;
-    padding: 32px 24px;
-    background: var(--bg);
-    position: fixed;
-    inset: 0;
-    z-index: 999;
-    transition: opacity 0.4s ease, transform 0.4s ease;
+    padding: 2rem;
+    background: var(--day-bg);
+    position: relative;
+    overflow: hidden;
   }
-  #login-screen.hidden { opacity: 0; pointer-events: none; transform: translateY(-20px); }
 
-  .login-ornament {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 11px;
-    letter-spacing: 0.35em;
-    color: var(--gold);
-    text-transform: uppercase;
-    margin-bottom: 10px;
+  #login-screen::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url('https://photos.fife.usercontent.google.com/pw/AP1GczPdiHSajFgcgkh3PqYlNmaJUI6fYAiVJt8fPREGroHBJQEajTQjlQM');
+    background-size: cover;
+    background-position: center 30%;
+    opacity: 0.4;
+    z-index: 0;
   }
+
+  #login-screen > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .login-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.68rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: #c9a96e;
+    margin-bottom: 3rem;
+  }
+
+  .login-eyebrow::before,
+  .login-eyebrow::after {
+    content: '\2014';
+    color: #c9a96e;
+  }
+
   .login-title {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 42px;
+    font-size: clamp(3rem, 13vw, 5.5rem);
     font-weight: 300;
-    color: var(--text);
+    color: #f5f0e8;
+    line-height: 1.05;
     text-align: center;
-    line-height: 1.1;
-    margin-bottom: 8px;
-  }
-  .login-subtitle {
-    font-size: 13px;
-    color: var(--text-dim);
-    text-align: center;
-    margin-bottom: 48px;
+    margin-bottom: 0.5rem;
     letter-spacing: 0.02em;
   }
-  .login-box {
-    width: 100%;
-    max-width: 320px;
+
+  .login-byline {
+    font-family: 'Jost', sans-serif;
+    font-size: 0.84rem;
+    letter-spacing: 0.12em;
+    color: rgba(245,240,232,0.45);
+    text-align: center;
+    margin-bottom: 4rem;
   }
+
+  .login-box {
+    background: var(--surface);
+    border-radius: 1rem;
+    padding: 2rem;
+    width: 100%;
+    max-width: 360px;
+  }
+
+  .login-box label {
+    display: block;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 500;
+    color: var(--ink-muted);
+    margin-bottom: 0.5rem;
+  }
+
   .login-box input {
     width: 100%;
-    background: var(--card);
-    border: 1px solid var(--spine);
-    border-radius: var(--radius);
-    padding: 16px 20px;
-    color: var(--text);
-    font-family: 'Inter', sans-serif;
-    font-size: 16px;
-    letter-spacing: 0.1em;
-    text-align: center;
+    padding: 0.9rem 1rem;
+    border: 2px solid var(--border);
+    border-radius: 0.5rem;
+    font-size: 1.1rem;
+    font-family: 'Jost', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
     outline: none;
     transition: border-color 0.2s;
-    -webkit-appearance: none;
+    margin-bottom: 1rem;
   }
-  .login-box input::placeholder { color: var(--text-faint); letter-spacing: 0.05em; }
-  .login-box input:focus { border-color: var(--gold); }
-  .login-box button {
+
+  .login-box input:focus { border-color: var(--accent); }
+
+  .login-btn {
     width: 100%;
-    margin-top: 14px;
-    background: var(--gold);
+    padding: 1rem;
+    background: var(--accent);
+    color: white;
     border: none;
-    border-radius: var(--radius);
-    padding: 16px;
-    color: #0f0e0c;
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
+    border-radius: 0.5rem;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.85rem;
     font-weight: 500;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     cursor: pointer;
     transition: opacity 0.2s;
   }
-  .login-box button:active { opacity: 0.8; }
+
+  .login-btn:hover { opacity: 0.85; }
+
   .login-error {
-    margin-top: 12px;
-    font-size: 12px;
-    color: #e07070;
+    margin-top: 0.75rem;
+    font-size: 0.85rem;
+    color: var(--accent);
     text-align: center;
-    min-height: 18px;
-  }
-  .login-divider {
-    width: 60px;
-    height: 1px;
-    background: var(--spine);
-    margin: 48px auto;
+    min-height: 1.2em;
   }
 
-  /* ── APP SHELL ── */
-  #app { display: none; flex-direction: column; min-height: 100dvh; }
-  #app.visible { display: flex; }
+  /* ── APP ── */
+  #app { display: none; }
 
-  /* ── HEADER ── */
-  #header {
-    position: relative;
-    min-height: 180px;
-    overflow: hidden;
-    flex-shrink: 0;
-  }
-  #header-bg {
-    position: absolute;
-    inset: 0;
-    background-size: cover;
-    background-position: center top;
-    background-color: #1a1710;
-    transition: opacity 0.5s;
-  }
-  #header-bg::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to bottom, rgba(15,14,12,0.45) 0%, rgba(15,14,12,0.72) 60%, #0f0e0c 100%);
-  }
-  #header-content {
-    position: relative;
-    z-index: 2;
-    padding: 52px 22px 0;
-  }
-  #trip-label {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 11px;
-    letter-spacing: 0.38em;
-    color: var(--gold);
-    text-transform: uppercase;
-    margin-bottom: 6px;
-    opacity: 0.9;
-  }
-  #trip-name {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 36px;
-    font-weight: 300;
-    color: var(--text);
-    line-height: 1.1;
-    margin-bottom: 20px;
-  }
-
-  /* Day tabs */
-  #day-tabs {
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
-    scrollbar-width: none;
-    padding-bottom: 18px;
-    -webkit-overflow-scrolling: touch;
-  }
-  #day-tabs::-webkit-scrollbar { display: none; }
-  .day-tab {
-    flex-shrink: 0;
-    padding: 7px 18px;
-    border-radius: 99px;
-    font-family: 'Inter', sans-serif;
-    font-size: 12px;
-    font-weight: 500;
-    letter-spacing: 0.06em;
-    cursor: pointer;
-    border: 1px solid rgba(201,169,110,0.45);
-    color: var(--gold);
-    background: transparent;
-    transition: background 0.2s, color 0.2s, border-color 0.2s;
-    white-space: nowrap;
-  }
-  .day-tab.active {
-    background: var(--gold);
-    color: #0f0e0c;
-    border-color: var(--gold);
-  }
-
-  /* ── CLOCK STRIP ── */
-  #clock-strip {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 9px 22px;
-    background: rgba(22,20,17,0.7);
-    backdrop-filter: blur(8px);
-    border-bottom: 1px solid var(--spine);
-    flex-shrink: 0;
-  }
-  #clock-time {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 20px;
-    font-weight: 400;
-    color: var(--gold);
-    letter-spacing: 0.05em;
-  }
-  #clock-label {
-    font-size: 11px;
-    color: var(--text-dim);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-
-  /* ── TIMELINE ── */
-  #timeline-wrap {
-    flex: 1;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    padding: 24px 0 120px;
-    position: relative;
-  }
-
-  /* BG image behind timeline */
-  #timeline-bg {
-    position: fixed;
-    inset: 0;
-    background-size: cover;
-    background-position: center;
-    opacity: 0.07;
-    pointer-events: none;
-    z-index: 0;
-    transition: opacity 0.5s;
-  }
-
-  #timeline {
-    position: relative;
-    z-index: 1;
-    padding: 0 18px 0 70px;
-  }
-
-  /* Vertical spine */
-  #timeline::before {
-    content: '';
-    position: absolute;
-    left: 52px;
+  .app-header {
+    background: var(--day-bg);
+    padding: 1.5rem 1.25rem 1.25rem;
+    position: sticky;
     top: 0;
-    bottom: 0;
-    width: 1px;
-    background: linear-gradient(to bottom, transparent, var(--spine) 5%, var(--spine) 95%, transparent);
-  }
-
-  .activity-row {
-    display: flex;
-    align-items: flex-start;
-    margin-bottom: 20px;
-    position: relative;
-    transition: opacity 0.4s, filter 0.4s;
-  }
-  .activity-row.past {
-    opacity: 0.38;
-    filter: saturate(0.15);
-  }
-
-  /* Time column */
-  .act-time {
-    position: absolute;
-    left: -52px;
-    width: 44px;
-    text-align: right;
-    top: 14px;
-    font-size: 10.5px;
-    color: var(--text-dim);
-    letter-spacing: 0.02em;
-    line-height: 1.3;
-    font-family: 'Inter', sans-serif;
-  }
-
-  /* Dot on spine */
-  .act-dot {
-    position: absolute;
-    left: -19px;
-    top: 16px;
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    background: var(--gold);
-    border: 2px solid var(--bg);
-    flex-shrink: 0;
-    z-index: 2;
-  }
-  .act-dot.upcoming {
-    background: var(--gold);
-    box-shadow: 0 0 0 0 var(--gold-glow);
-    animation: pulse-dot 2s infinite;
-  }
-  @keyframes pulse-dot {
-    0% { box-shadow: 0 0 0 0 var(--gold-glow); }
-    70% { box-shadow: 0 0 0 8px transparent; }
-    100% { box-shadow: 0 0 0 0 transparent; }
-  }
-
-  /* Card */
-  .act-card {
-    background: var(--card);
-    border-radius: var(--radius);
-    padding: 14px 16px;
-    width: 100%;
-    cursor: pointer;
-    border: 1px solid transparent;
-    transition: border-color 0.2s, background 0.2s;
-    position: relative;
-    overflow: hidden;
-  }
-  .act-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: var(--radius);
-    background: linear-gradient(135deg, rgba(201,169,110,0.06) 0%, transparent 60%);
-    pointer-events: none;
-  }
-  .act-card:active { border-color: var(--gold-dim); background: var(--card2); }
-
-  .act-card-inner {
-    display: flex;
-    align-items: flex-start;
-    gap: 13px;
-  }
-  .act-icon {
-    font-size: 22px;
-    line-height: 1;
-    flex-shrink: 0;
-    margin-top: 2px;
-  }
-  .act-info { flex: 1; min-width: 0; }
-  .act-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 18px;
-    font-weight: 500;
-    color: var(--text);
-    line-height: 1.2;
-    margin-bottom: 4px;
-  }
-  .act-location {
-    font-size: 12px;
-    color: var(--text-dim);
-    letter-spacing: 0.02em;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-  .act-location svg { flex-shrink: 0; opacity: 0.6; }
-
-  /* Up next badge */
-  .up-next-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(201,169,110,0.12);
-    border: 1px solid rgba(201,169,110,0.35);
-    border-radius: 99px;
-    padding: 3px 10px 3px 7px;
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 10px;
-  }
-  .up-next-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--gold);
-    animation: pulse-dot 1.6s infinite;
-  }
-
-  /* ── DRAWER ── */
-  #drawer-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.55);
     z-index: 100;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s;
-  }
-  #drawer-backdrop.open { opacity: 1; pointer-events: all; }
-
-  #drawer {
-    position: fixed;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%) translateY(100%);
-    width: 100%;
-    max-width: 430px;
-    background: var(--card);
-    border-radius: var(--drawer-radius) var(--drawer-radius) 0 0;
-    z-index: 101;
-    transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
-    max-height: 85dvh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-  #drawer.open { transform: translateX(-50%) translateY(0); }
-
-  #drawer-handle-wrap {
-    padding: 12px 0 0;
-    display: flex;
-    justify-content: center;
-    flex-shrink: 0;
-    cursor: grab;
-  }
-  .drawer-handle {
-    width: 36px;
-    height: 4px;
-    border-radius: 99px;
-    background: rgba(201,169,110,0.3);
   }
 
-  #drawer-scroll {
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    padding: 16px 24px 40px;
-    flex: 1;
-  }
-
-  #drawer-time-badge {
-    font-size: 11px;
-    color: var(--gold);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    margin-bottom: 8px;
-  }
-  #drawer-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 28px;
-    font-weight: 400;
-    color: var(--text);
-    line-height: 1.15;
-    margin-bottom: 20px;
-  }
-  #drawer-story {
-    font-size: 14px;
-    color: var(--text-dim);
-    line-height: 1.7;
-    margin-bottom: 24px;
-    white-space: pre-line;
-  }
-
-  .drawer-section {
-    margin-bottom: 20px;
-  }
-  .drawer-section-label {
-    font-size: 10px;
+  .header-eyebrow {
+    font-size: 0.68rem;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: var(--text-faint);
-    margin-bottom: 8px;
+    color: #5a5248;
+    margin-bottom: 0.15rem;
   }
-  .drawer-map-link {
+
+  .header-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.6rem, 6vw, 2.4rem);
+    font-weight: 600;
+    color: var(--day-text);
+    line-height: 1.1;
+  }
+
+  .header-name span {
+    color: var(--accent);
+    font-style: italic;
+  }
+
+  /* ── DAY GROUP ── */
+  .day-group { margin-bottom: 0.5rem; }
+
+  .day-label {
     display: flex;
     align-items: center;
-    gap: 10px;
-    background: var(--card2);
-    border: 1px solid var(--spine);
-    border-radius: 10px;
-    padding: 13px 16px;
-    color: var(--gold);
-    text-decoration: none;
-    font-size: 13px;
+    gap: 0.75rem;
+    padding: 1.25rem 1.25rem 0.6rem;
+  }
+
+  .day-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.9rem;
+    font-weight: 300;
+    color: #b8ad9e;
+    line-height: 1;
+    user-select: none;
+  }
+
+  .day-info { flex: 1; }
+
+  .day-word {
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #9e958a;
     font-weight: 500;
-    transition: border-color 0.2s;
   }
-  .drawer-map-link:active { border-color: var(--gold); }
-  .drawer-map-link svg { flex-shrink: 0; }
 
-  .drawer-url-link {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: var(--card2);
-    border: 1px solid var(--spine);
-    border-radius: 10px;
-    padding: 13px 16px;
-    color: var(--text-dim);
-    text-decoration: none;
-    font-size: 13px;
+  .day-date {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.15rem;
     font-weight: 400;
-    transition: border-color 0.2s;
-    word-break: break-all;
+    color: #3a3530;
   }
-  .drawer-url-link:active { border-color: var(--gold); }
 
-  .drawer-divider {
+  .day-rule {
     height: 1px;
-    background: var(--spine);
-    margin: 20px 0;
+    background: var(--border);
+    margin: 0 1.25rem 0.75rem;
   }
 
-  /* ── LOADING ── */
-  #loading {
-    position: fixed;
-    inset: 0;
+  /* ── ACTIVITY CARD ── */
+  .cards { padding: 0 1rem; display: flex; flex-direction: column; gap: 0.75rem; }
+
+  .card {
+    background: var(--surface);
+    border-radius: 0.875rem;
+    overflow: hidden;
+    border: 1px solid rgba(232,226,217,0.6);
+    transition: box-shadow 0.2s;
+  }
+
+  .card:active { box-shadow: 0 6px 24px rgba(0,0,0,0.1); }
+
+  .card-inner { padding: 1.1rem 1.25rem 1.25rem; }
+
+  /* TIME — big and bold */
+  .card-time {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.31rem;
+    font-weight: 300;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 0.3rem;
+    letter-spacing: 0.02em;
+    opacity: 0.85;
+  }
+
+  .card-time-label {
+    font-size: 0.63rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    font-weight: 500;
+    margin-bottom: 0.6rem;
+  }
+
+  /* ACTIVITY — hero text */
+  .card-activity {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.4rem, 5vw, 1.8rem);
+    font-weight: 300;
+    color: var(--ink);
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+  }
+
+  /* LOCATION */
+  .card-location {
     display: flex;
+    align-items: flex-start;
+    gap: 0.35rem;
+    font-size: 0.86rem;
+    color: var(--ink-muted);
+    font-weight: 300;
+    margin-bottom: 0.5rem;
+  }
+
+  .card-location svg {
+    flex-shrink: 0;
+    margin-top: 1px;
+    color: var(--accent);
+    opacity: 0.7;
+  }
+
+  /* FIELD1 / notes */
+  .card-field1 {
+    font-size: 0.89rem;
+    color: var(--ink-muted);
+    line-height: 1.6;
+    font-weight: 300;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border);
+    margin-top: 0.6rem;
+  }
+
+  /* STORY */
+  .card-story {
+    font-size: 0.92rem;
+    color: var(--ink-muted);
+    line-height: 1.7;
+    padding-top: 0.6rem;
+    border-top: 1px solid var(--border);
+    margin-top: 0.6rem;
+    font-style: italic;
+  }
+
+  /* URL link */
+  .card-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-top: 0.75rem;
+    padding: 0.55rem 1rem;
+    background: var(--accent-light);
+    color: var(--accent);
+    border-radius: 2rem;
+    font-size: 0.82rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+
+  .card-link:hover { background: #eedad2; }
+
+  /* accent strip on left of card for "now" */
+  .card.is-now { border-left: 4px solid var(--accent); }
+
+  /* ── LOADING / ERROR ── */
+  .state-msg {
+    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: var(--bg);
-    z-index: 90;
-    flex-direction: column;
-    gap: 16px;
-    transition: opacity 0.4s;
+    min-height: 40vh;
+    gap: 0.75rem;
+    color: var(--ink-muted);
+    font-size: 0.945rem;
+    padding: 2rem;
+    text-align: center;
   }
-  #loading.hidden { opacity: 0; pointer-events: none; }
-  .loading-spinner {
-    width: 28px;
-    height: 28px;
-    border: 2px solid var(--spine);
-    border-top-color: var(--gold);
+
+  .spinner {
+    width: 2rem; height: 2rem;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
   }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .loading-text {
-    font-size: 12px;
-    color: var(--text-faint);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
 
-  /* ── EMPTY STATE ── */
-  .empty-state {
-    text-align: center;
-    padding: 60px 32px;
-    color: var(--text-dim);
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 20px;
-    font-style: italic;
-  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .hidden { display: none !important; }
 </style>
 </head>
 <body>
 
 <!-- LOGIN -->
 <div id="login-screen">
-  <div class="login-ornament">Welcome</div>
-  <div class="login-title">Your<br>Itinerary</div>
-  <div class="login-subtitle">Enter your access code to continue</div>
+  <p class="login-eyebrow">Guest Itinerary</p>
+  <h1 class="login-title">Welcome,<br>you're expected.</h1>
+  <p class="login-byline">relax and pull some weeds</p>
   <div class="login-box">
-    <input type="text" id="code-input" placeholder="Access code" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-    <button onclick="handleLogin()">Continue</button>
-    <div class="login-error" id="login-error"></div>
+    <label for="code-input">Access Code</label>
+    <input id="code-input" type="text" placeholder="Enter your code" autocomplete="off" autocapitalize="none" spellcheck="false">
+    <button class="login-btn" onclick="handleLogin()">Let's Go →</button>
+    <p class="login-error" id="login-error"></p>
   </div>
-  <div class="login-divider"></div>
-</div>
-
-<!-- LOADING -->
-<div id="loading">
-  <div class="loading-spinner"></div>
-  <div class="loading-text">Preparing your journey</div>
 </div>
 
 <!-- APP -->
 <div id="app">
-  <!-- Timeline BG -->
-  <div id="timeline-bg"></div>
-
-  <!-- Header -->
-  <div id="header">
-    <div id="header-bg"></div>
-    <div id="header-content">
-      <div id="trip-label">Your Itinerary</div>
-      <div id="trip-name">Loading…</div>
-      <div id="day-tabs"></div>
-    </div>
-  </div>
-
-  <!-- Clock Strip -->
-  <div id="clock-strip">
-    <div id="clock-time">—</div>
-    <div id="clock-label">—</div>
-  </div>
-
-  <!-- Timeline -->
-  <div id="timeline-wrap">
-    <div id="timeline"></div>
-  </div>
-</div>
-
-<!-- Drawer backdrop -->
-<div id="drawer-backdrop" onclick="closeDrawer()"></div>
-
-<!-- Bottom Drawer -->
-<div id="drawer">
-  <div id="drawer-handle-wrap">
-    <div class="drawer-handle"></div>
-  </div>
-  <div id="drawer-scroll">
-    <div id="drawer-time-badge"></div>
-    <div id="drawer-title"></div>
-    <div id="drawer-story"></div>
-    <div id="drawer-details"></div>
-  </div>
+  <header class="app-header">
+    <p class="header-eyebrow">Your itinerary</p>
+    <h1 class="header-name" id="group-title">Loading…</h1>
+  </header>
+  <main id="itinerary-body"></main>
 </div>
 
 <script>
-// ─── CONFIG ──────────────────────────────────────────────────────────────────
-const SHEET_ID  = '1Y0qgm9aov7qaQOcdE3khXit85loGs9FmU2tvsl0ZCXU';
-const API_KEY   = 'AIzaSyBpvELhAkbUZQXwjhz65S28tRX4iNHIdhk';
+const SHEET_ID = '1Y0qgm9aov7qaQOcdE3khXit85loGs9FmU2tvsl0ZCXU';
+const API_KEY  = 'AIzaSyBpvELhAkbUZQXwjhz65S28tRX4iNHIdhk';
 
 const GROUPS = {
-  '2012':   { tab: 'obrien',     name: 'April Visit' },
-  'wyllie': { tab: 'assynipple', name: 'Wyllie' },
-  'kelly':  { tab: 'kelly',      name: 'Stacey & Aaron' },
-  'GROUP4': { tab: 'group4',     name: 'Group 4' },
-  'GROUP5': { tab: 'group5',     name: 'Group 5' },
+  '2012':    { tab: 'obrien',     name: 'April Visit' },
+  'wyllie':  { tab: 'assynipple', name: 'Wyllie' },
+  'kelly':   { tab: 'kelly',      name: 'Stacey & Aaron' },
+  'GROUP4':  { tab: 'group4',     name: 'Group 4' },
+  'GROUP5':  { tab: 'group5',     name: 'Group 5' },
 };
 
-// ─── STATE ───────────────────────────────────────────────────────────────────
-let currentGroup = null;
-let allDays = {};      // dayNum → [ activity, … ]
-let dayDates = {};     // dayNum → 'YYYY-MM-DD'
-let currentDay = 1;
-let clockInterval = null;
-
-// ─── UTILS ───────────────────────────────────────────────────────────────────
-function gdriveDirect(url) {
-  if (!url) return '';
-  const m = url.match(/\/d\/([^/]+)/);
-  if (m) return `https://drive.google.com/uc?export=view&id=${m[1]}`;
-  const m2 = url.match(/[?&]id=([^&]+)/);
-  if (m2) return `https://drive.google.com/uc?export=view&id=${m2[1]}`;
-  return url;
-}
-
-function parseTime(hourStr) {
-  // Returns minutes since midnight, or null
-  if (!hourStr) return null;
-  const m = hourStr.trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)?$/i);
-  if (!m) return null;
-  let h = parseInt(m[1], 10);
-  const min = parseInt(m[2], 10);
-  const ampm = (m[3] || '').toUpperCase();
-  if (ampm === 'PM' && h !== 12) h += 12;
-  if (ampm === 'AM' && h === 12) h = 0;
-  return h * 60 + min;
-}
-
-function formatTime(hourStr) {
-  if (!hourStr) return '';
-  return hourStr.trim();
-}
-
-function nowMinutes() {
-  const now = new Date();
-  return now.getHours() * 60 + now.getMinutes();
-}
-
-function todayStr() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-}
-
-function inferIcon(title) {
-  if (!title) return '✦';
-  const t = title.toLowerCase();
-  if (/coffee|café|cafe|espresso|brew/.test(t))   return '☕';
-  if (/breakfast|brunch/.test(t))                  return '🍳';
-  if (/lunch/.test(t))                              return '🥗';
-  if (/dinner|supper|restaurant|dining/.test(t))   return '🍽️';
-  if (/wine|winery|cellar|tasting/.test(t))         return '🍷';
-  if (/beer|brewery|pub|bar/.test(t))               return '🍺';
-  if (/cocktail|drink/.test(t))                     return '🍸';
-  if (/walk|hike|trail|bush/.test(t))               return '🥾';
-  if (/swim|pool|beach|ocean|sea/.test(t))          return '🏊';
-  if (/boat|sail|cruise|kayak|canoe/.test(t))       return '⛵';
-  if (/flight|airport|plane|fly/.test(t))           return '✈️';
-  if (/drive|car|road|transfer/.test(t))            return '🚗';
-  if (/train|rail/.test(t))                         return '🚂';
-  if (/hotel|check.?in|check.?out|resort|lodge/.test(t)) return '🏨';
-  if (/spa|massage|wellness|relax/.test(t))         return '💆';
-  if (/museum|gallery|art|exhibition/.test(t))      return '🏛️';
-  if (/market|shop|store/.test(t))                  return '🛍️';
-  if (/tour|visit|sightseeing/.test(t))             return '🗺️';
-  if (/show|theatre|theater|concert|music/.test(t))return '🎭';
-  if (/golf/.test(t))                               return '⛳';
-  if (/yoga|pilates/.test(t))                       return '🧘';
-  if (/picnic/.test(t))                             return '🧺';
-  if (/sunset|sunrise/.test(t))                     return '🌅';
-  if (/free time|leisure|relax/.test(t))            return '☀️';
-  return '✦';
-}
-
-function buildMapsUrl(row) {
-  if (row.MAP && /^https?:\/\//.test(row.MAP.trim())) return row.MAP.trim();
-  const dest = (row.ADDRESS || row.LOCATION || '').trim();
-  if (!dest) return null;
-  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(dest)}&travelmode=driving`;
-}
-
-// ─── LOGIN ───────────────────────────────────────────────────────────────────
-function handleLogin() {
-  const raw = document.getElementById('code-input').value.trim();
-  // Try exact match first, then case-insensitive
-  let group = GROUPS[raw] || GROUPS[raw.toUpperCase()] || null;
-  if (!group) {
-    // case-insensitive search
-    for (const [key, val] of Object.entries(GROUPS)) {
-      if (key.toLowerCase() === raw.toLowerCase()) { group = val; break; }
-    }
-  }
-  if (!group) {
-    document.getElementById('login-error').textContent = 'Incorrect code — please try again.';
-    return;
-  }
-  localStorage.setItem('itinerary_code', raw);
-  startApp(group);
-}
+// Check URL param on load
+window.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(location.search);
+  const code = params.get('code');
+  if (code) tryCode(code);
+});
 
 document.getElementById('code-input').addEventListener('keydown', e => {
   if (e.key === 'Enter') handleLogin();
 });
 
-// ─── URL PARAM AUTO-LOGIN ────────────────────────────────────────────────────
-function getUrlCode() {
-  return new URLSearchParams(window.location.search).get('code');
+function handleLogin() {
+  const raw = document.getElementById('code-input').value.trim();
+  tryCode(raw);
 }
 
-function resolveCode(raw) {
-  if (!raw) return null;
-  let group = GROUPS[raw] || GROUPS[raw.toUpperCase()] || null;
-  if (!group) {
-    for (const [key, val] of Object.entries(GROUPS)) {
-      if (key.toLowerCase() === raw.toLowerCase()) { group = val; break; }
-    }
+function tryCode(raw) {
+  // case-insensitive match
+  const match = Object.entries(GROUPS).find(([k]) => k.toLowerCase() === raw.toLowerCase());
+  if (!match) {
+    document.getElementById('login-error').textContent = 'Code not recognised — try again.';
+    return;
   }
-  return group;
+  const [, group] = match;
+  loadItinerary(group);
 }
 
-// ─── FETCH SHEET ─────────────────────────────────────────────────────────────
-async function fetchSheet(tabName) {
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(tabName)}?key=${API_KEY}`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`Sheet fetch failed: ${res.status}`);
-  const data = await res.json();
-  return data.values || [];
-}
+async function loadItinerary(group) {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
 
-function parseRows(values) {
-  if (!values.length) return [];
-  const headers = values[0].map(h => h.trim().toUpperCase());
-  return values.slice(1).map(row => {
-    const obj = {};
-    headers.forEach((h, i) => { obj[h] = (row[i] || '').trim(); });
-    return obj;
-  }).filter(r => r.DAY || r.ACTIVITY);
-}
+  const titleEl = document.getElementById('group-title');
+  // Bold name with italic accent on last word
+  const parts = group.name.split(' ');
+  if (parts.length > 1) {
+    titleEl.innerHTML = parts.slice(0, -1).join(' ') + ' <span>' + parts.at(-1) + '</span>';
+  } else {
+    titleEl.innerHTML = '<span>' + group.name + '</span>';
+  }
 
-// ─── START APP ───────────────────────────────────────────────────────────────
-async function startApp(group) {
-  currentGroup = group;
-  document.getElementById('login-screen').classList.add('hidden');
-  document.getElementById('loading').classList.remove('hidden');
-  document.getElementById('app').classList.remove('visible');
+  const body = document.getElementById('itinerary-body');
+  body.innerHTML = `<div class="state-msg"><div class="spinner"></div><p>Fetching your plans…</p></div>`;
 
   try {
-    const values = await fetchSheet(group.tab);
-    const rows = parseRows(values);
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(group.tab)}?key=${API_KEY}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Sheet fetch failed');
+    const json = await res.json();
+    const [header, ...rows] = json.values || [];
+
+    const col = k => header.findIndex(h => h.trim().toUpperCase() === k.toUpperCase());
+    const iDay = col('DAY'), iHour = col('HOUR'), iAct = col('ACTIVITY'),
+          iLoc = col('LOCATION'), iF1 = col('FIELD1'), iUrl = col('URL'), iStory = col('STORY');
 
     // Group by day
-    allDays = {};
-    dayDates = {};
-    rows.forEach(r => {
-      const d = parseInt(r.DAY, 10);
-      if (!d) return;
-      if (!allDays[d]) allDays[d] = [];
-      allDays[d].push(r);
-      if (r.DATE && r.DATE.match(/^\d{4}-\d{2}-\d{2}$/)) {
-        dayDates[d] = r.DATE;
-      }
-    });
-
-    // Determine today's day
-    const today = todayStr();
-    const dayNums = Object.keys(allDays).map(Number).sort((a,b)=>a-b);
-
-    let matched = null;
-    dayNums.forEach(d => { if (dayDates[d] === today) matched = d; });
-
-    if (matched !== null) {
-      currentDay = matched;
-    } else {
-      // check if today is before or after
-      const dateList = dayNums.map(d => dayDates[d]).filter(Boolean).sort();
-      if (dateList.length) {
-        if (today < dateList[0]) currentDay = dayNums[0];
-        else currentDay = dayNums[dayNums.length - 1];
-      } else {
-        currentDay = dayNums[0] || 1;
-      }
+    const days = {};
+    for (const row of rows) {
+      const day = row[iDay] || '?';
+      if (!days[day]) days[day] = [];
+      days[day].push(row);
     }
 
     // Render
-    document.getElementById('trip-name').textContent = group.name;
-    renderDayTabs(dayNums);
-
-    // Images from first activity of any day that has them
-    let bannerImg = '', bgImg = '';
-    for (const d of dayNums) {
-      for (const r of allDays[d]) {
-        if (!bannerImg && r.BANNER_IMAGE) bannerImg = gdriveDirect(r.BANNER_IMAGE);
-        if (!bgImg && r.BG_IMAGE) bgImg = gdriveDirect(r.BG_IMAGE);
-        if (bannerImg && bgImg) break;
-      }
-      if (bannerImg && bgImg) break;
-    }
-    if (bannerImg) document.getElementById('header-bg').style.backgroundImage = `url(${bannerImg})`;
-    if (bgImg) {
-      document.getElementById('timeline-bg').style.backgroundImage = `url(${bgImg})`;
-      document.getElementById('timeline-bg').style.opacity = '0.07';
-    }
-
-    renderDay(currentDay);
-    startClock();
-
-    document.getElementById('loading').classList.add('hidden');
-    document.getElementById('app').classList.add('visible');
-
-  } catch(err) {
-    document.getElementById('loading').classList.add('hidden');
-    document.getElementById('login-error').textContent = 'Could not load itinerary. Please try again.';
-    document.getElementById('login-screen').classList.remove('hidden');
-    console.error(err);
-  }
-}
-
-// ─── DAY TABS ────────────────────────────────────────────────────────────────
-function renderDayTabs(dayNums) {
-  const wrap = document.getElementById('day-tabs');
-  wrap.innerHTML = '';
-  dayNums.forEach(d => {
-    const btn = document.createElement('button');
-    btn.className = 'day-tab' + (d === currentDay ? ' active' : '');
-    btn.textContent = `Day ${d}`;
-    btn.onclick = () => {
-      currentDay = d;
-      document.querySelectorAll('.day-tab').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      renderDay(d);
-      // Update BG image for that day
-      const acts = allDays[d] || [];
-      for (const r of acts) {
-        if (r.BG_IMAGE) {
-          document.getElementById('timeline-bg').style.backgroundImage = `url(${gdriveDirect(r.BG_IMAGE)})`;
-          break;
-        }
-      }
-    };
-    wrap.appendChild(btn);
-  });
-}
-
-// ─── RENDER DAY ──────────────────────────────────────────────────────────────
-function renderDay(dayNum) {
-  const timeline = document.getElementById('timeline');
-  timeline.innerHTML = '';
-  const acts = (allDays[dayNum] || []).slice().sort((a,b) => {
-    const ta = parseTime(a.HOUR), tb = parseTime(b.HOUR);
-    if (ta === null && tb === null) return 0;
-    if (ta === null) return 1;
-    if (tb === null) return -1;
-    return ta - tb;
-  });
-
-  if (!acts.length) {
-    timeline.innerHTML = '<div class="empty-state">Nothing scheduled for this day.</div>';
-    return;
-  }
-
-  const dayNums = Object.keys(allDays).map(Number).sort((a,b)=>a-b);
-  const today = todayStr();
-  const isToday = dayDates[dayNum] === today;
-  const isPast  = dayDates[dayNum] && dayDates[dayNum] < today;
-  const now = nowMinutes();
-
-  // Find "up next"
-  let upNextIdx = -1;
-  if (isToday) {
-    for (let i = 0; i < acts.length; i++) {
-      const t = parseTime(acts[i].HOUR);
-      if (t !== null && t > now) { upNextIdx = i; break; }
-    }
-  }
-
-  acts.forEach((act, i) => {
-    const t = parseTime(act.HOUR);
-    const isPastAct = isPast || (isToday && t !== null && t <= now);
-    const isUpNext  = isToday && i === upNextIdx;
-
-    const row = document.createElement('div');
-    row.className = 'activity-row' + (isPastAct ? ' past' : '');
-
-    // Up next badge
-    let badgeHTML = '';
-    if (isUpNext) {
-      badgeHTML = `<div class="up-next-badge"><span class="up-next-dot"></span>Up next</div>`;
-    }
-
-    const loc = (act.LOCATION || act.ADDRESS || '').trim();
-    const locHTML = loc ? `<div class="act-location">
-      <svg width="10" height="12" viewBox="0 0 10 12" fill="none"><path d="M5 0C2.24 0 0 2.24 0 5c0 3.75 5 7 5 7s5-3.25 5-7c0-2.76-2.24-5-5-5zm0 6.75A1.75 1.75 0 1 1 5 3.25a1.75 1.75 0 0 1 0 3.5z" fill="currentColor"/></svg>
-      ${loc}
-    </div>` : '';
-
-    row.innerHTML = `
-      <div class="act-time">${formatTime(act.HOUR)}</div>
-      <div class="act-dot${isUpNext ? ' upcoming' : ''}"></div>
-      <div class="act-card">
-        ${badgeHTML}
-        <div class="act-card-inner">
-          <div class="act-icon">${inferIcon(act.ACTIVITY)}</div>
-          <div class="act-info">
-            <div class="act-title">${act.ACTIVITY || '—'}</div>
-            ${locHTML}
+    body.innerHTML = Object.entries(days).map(([day, items]) => `
+      <div class="day-group">
+        <div class="day-label">
+          <div class="day-num">${String(day).padStart(2,'0')}</div>
+          <div class="day-info">
+            <div class="day-word">Day</div>
+            <div class="day-date">${dayLabel(day, items)}</div>
           </div>
         </div>
+        <div class="day-rule"></div>
+        <div class="cards">
+          ${items.map(row => renderCard(row, iHour, iAct, iLoc, iF1, iUrl, iStory)).join('')}
+        </div>
       </div>
-    `;
+    `).join('');
 
-    row.querySelector('.act-card').addEventListener('click', () => openDrawer(act));
-    timeline.appendChild(row);
-  });
-
-  // Update clock label
-  updateClockLabel(dayNum);
+  } catch (e) {
+    body.innerHTML = `<div class="state-msg"><p>Couldn't load your itinerary.<br>Please check your connection.</p></div>`;
+  }
 }
 
-// ─── CLOCK ───────────────────────────────────────────────────────────────────
-function startClock() {
-  updateClock();
-  if (clockInterval) clearInterval(clockInterval);
-  clockInterval = setInterval(() => {
-    updateClock();
-    renderDay(currentDay);
-  }, 60000);
+function renderCard(row, iHour, iAct, iLoc, iF1, iUrl, iStory) {
+  const hour    = iHour  >= 0 ? (row[iHour]  || '') : '';
+  const act     = iAct   >= 0 ? (row[iAct]   || '') : '';
+  const loc     = iLoc   >= 0 ? (row[iLoc]   || '') : '';
+  const field1  = iF1    >= 0 ? (row[iF1]    || '') : '';
+  const url     = iUrl   >= 0 ? (row[iUrl]   || '') : '';
+  const story   = iStory >= 0 ? (row[iStory] || '') : '';
+
+  const timeStr = formatHour(hour);
+
+  return `
+    <div class="card">
+      <div class="card-inner">
+        ${timeStr ? `
+          <div class="card-time">${timeStr}</div>
+          <div class="card-time-label">Time</div>
+        ` : ''}
+        ${act ? `<div class="card-activity">${act}</div>` : ''}
+        ${loc ? `
+          <div class="card-location">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            ${loc}
+          </div>
+        ` : ''}
+        ${field1 ? `<div class="card-field1">${field1}</div>` : ''}
+        ${story  ? `<div class="card-story">${story}</div>`  : ''}
+        ${url    ? `<a class="card-link" href="${url}" target="_blank" rel="noopener">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          More info
+        </a>` : ''}
+      </div>
+    </div>
+  `;
 }
 
-function updateClock() {
-  const now = new Date();
-  let h = now.getHours(), m = now.getMinutes();
-  const ampm = h >= 12 ? 'PM' : 'AM';
-  if (h > 12) h -= 12;
-  if (h === 0) h = 12;
-  document.getElementById('clock-time').textContent = `${h}:${String(m).padStart(2,'0')} ${ampm}`;
-  updateClockLabel(currentDay);
+function formatHour(raw) {
+  if (!raw && raw !== 0) return '';
+  const n = parseFloat(String(raw).replace(',','.'));
+  if (isNaN(n)) return raw;
+  const h = Math.floor(n);
+  const m = Math.round((n - h) * 60);
+  const hh = h % 12 || 12;
+  const ampm = h < 12 ? 'am' : 'pm';
+  return m === 0 ? `${hh}${ampm}` : `${hh}:${String(m).padStart(2,'0')}${ampm}`;
 }
 
-function updateClockLabel(dayNum) {
-  const dayNums = Object.keys(allDays).map(Number).sort((a,b)=>a-b);
-  const today = todayStr();
-  const date = dayDates[dayNum];
-  let label = `Day ${dayNum}`;
-  if (date === today) label += '  ·  Today';
-  else if (date) {
-    const d = new Date(date + 'T00:00:00');
-    label += `  ·  ${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
-  }
-  document.getElementById('clock-label').textContent = label;
+function dayLabel(day, items) {
+  // Just show "Day N" label nicely — could enhance with actual dates if sheet provides them
+  const ordinals = ['','First','Second','Third','Fourth','Fifth','Sixth','Seventh'];
+  const n = parseInt(day);
+  return ordinals[n] ? ordinals[n] + ' Day' : `Day ${day}`;
 }
-
-// ─── DRAWER ──────────────────────────────────────────────────────────────────
-let drawerOpen = false;
-let touchStartY = 0;
-
-function openDrawer(act) {
-  document.getElementById('drawer-time-badge').textContent = formatTime(act.HOUR);
-  document.getElementById('drawer-title').textContent = act.ACTIVITY || '—';
-  document.getElementById('drawer-story').textContent = act.STORY || '';
-
-  const details = document.getElementById('drawer-details');
-  details.innerHTML = '';
-
-  const mapsUrl = buildMapsUrl(act);
-  const loc = (act.LOCATION || act.ADDRESS || '').trim();
-
-  if (mapsUrl) {
-    const sec = document.createElement('div');
-    sec.className = 'drawer-section';
-    sec.innerHTML = `
-      <div class="drawer-section-label">Location</div>
-      <a class="drawer-map-link" href="${mapsUrl}" target="_blank" rel="noopener">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 0C5.24 0 3 2.24 3 5c0 4.5 5 11 5 11s5-6.5 5-11C13 2.24 10.76 0 8 0zm0 7a2 2 0 1 1 0-4 2 2 0 0 1 0 4z" fill="currentColor"/></svg>
-        ${loc || 'Get directions'}
-      </a>`;
-    details.appendChild(sec);
-  }
-
-  if (act.FIELD1 && act.FIELD1.trim()) {
-    const sec = document.createElement('div');
-    sec.className = 'drawer-section';
-    sec.innerHTML = `
-      <div class="drawer-section-label">Notes</div>
-      <div style="font-size:13px;color:var(--text-dim);line-height:1.65">${act.FIELD1}</div>`;
-    details.appendChild(sec);
-  }
-
-  if (act.URL && act.URL.trim()) {
-    const sec = document.createElement('div');
-    sec.className = 'drawer-section';
-    sec.innerHTML = `
-      <div class="drawer-section-label">Link</div>
-      <a class="drawer-url-link" href="${act.URL}" target="_blank" rel="noopener">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5.5 3.5H3a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V7" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/><path d="M8.5 1H13v4.5M13 1 7 7" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        ${act.URL}
-      </a>`;
-    details.appendChild(sec);
-  }
-
-  document.getElementById('drawer').classList.add('open');
-  document.getElementById('drawer-backdrop').classList.add('open');
-  document.getElementById('drawer-scroll').scrollTop = 0;
-  drawerOpen = true;
-}
-
-function closeDrawer() {
-  document.getElementById('drawer').classList.remove('open');
-  document.getElementById('drawer-backdrop').classList.remove('open');
-  drawerOpen = false;
-}
-
-// Swipe down to close
-const drawer = document.getElementById('drawer');
-drawer.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; }, { passive: true });
-drawer.addEventListener('touchend', e => {
-  const dy = e.changedTouches[0].clientY - touchStartY;
-  if (dy > 60) closeDrawer();
-}, { passive: true });
-
-// ─── BOOT ────────────────────────────────────────────────────────────────────
-(function boot() {
-  // 1. URL param
-  const urlCode = getUrlCode();
-  if (urlCode) {
-    const group = resolveCode(urlCode);
-    if (group) {
-      localStorage.setItem('itinerary_code', urlCode);
-      startApp(group);
-      return;
-    }
-  }
-  // 2. localStorage
-  const saved = localStorage.getItem('itinerary_code');
-  if (saved) {
-    const group = resolveCode(saved);
-    if (group) {
-      startApp(group);
-      return;
-    }
-  }
-  // 3. Show login
-  document.getElementById('loading').classList.add('hidden');
-})();
 </script>
 </body>
 </html>
