@@ -648,7 +648,7 @@ const ICON_MAP = [
   { keys: ['free time','leisure','explore','wander','stroll'], icon: '🗺️' },
   { keys: ['welcome','meet','greeting'], icon: '👋' },
   { keys: ['sunrise','sunset','view','overlook','scenic'], icon: '🌅' },
-  { keys: ['farm','winery visit','vineyard','orchard','harvest'], icon: '🍇' },
+  { keys: ['farm','winery','vineyard','orchard','harvest'], icon: '🍇' },
   { keys: ['nap','sleep','rest','snooze'], icon: '🛏️' },
   { keys: ['picnic','bbq','barbecue','outdoor dining'], icon: '🧺' },
   { keys: ['gang'], icon: '✈️' },
@@ -946,7 +946,7 @@ function refreshActivityStates() {
       const hourRaw = r.dataset.hour;
       const rowMins = hourToMinutes(hourRaw);
 
-      if (rowMins !== null && rowMins <= nowMins) {
+      if (rowMins !== null && rowMins < nowMins) {
         // Past activity on today
         r.classList.add('is-past');
         r.classList.remove('is-upnext');
