@@ -572,7 +572,7 @@
 <!-- LOGIN -->
 <div id="login-screen">
   <p class="login-eyebrow">Guest Itinerary</p>
-  <h1 class="login-title">Welcomed</h1>
+  <h1 class="login-title">Welcome</h1>
   <p class="login-byline">relax and pull some weeds</p>
   <div class="login-box">
     <label for="code-input">Access Code</label>
@@ -669,12 +669,42 @@ let activeDayIdx = 0;
 let clockTimer = null;
 
 /* ─────────────────────────────────────────
+   SESSION PERSISTENCE  (30-day remember)
+───────────────────────────────────────── */
+const SESSION_KEY    = 'itinerary_session';
+const SESSION_DAYS   = 30;
+
+function saveSession(code) {
+  const expires = Date.now() + SESSION_DAYS * 24 * 60 * 60 * 1000;
+  localStorage.setItem(SESSION_KEY, JSON.stringify({ code, expires }));
+}
+
+function loadSession() {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    if (!raw) return null;
+    const { code, expires } = JSON.parse(raw);
+    if (Date.now() > expires) { localStorage.removeItem(SESSION_KEY); return null; }
+    return code;
+  } catch { return null; }
+}
+
+function clearSession() {
+  localStorage.removeItem(SESSION_KEY);
+}
+
+/* ─────────────────────────────────────────
    LOGIN
 ───────────────────────────────────────── */
 window.addEventListener('DOMContentLoaded', () => {
+  // 1. Honour ?code= URL param
   const params = new URLSearchParams(location.search);
-  const code = params.get('code');
-  if (code) tryCode(code);
+  const urlCode = params.get('code');
+  if (urlCode) { tryCode(urlCode); return; }
+
+  // 2. Resume saved session
+  const saved = loadSession();
+  if (saved) { tryCode(saved, /* silent */ true); return; }
 });
 
 document.getElementById('code-input').addEventListener('keydown', e => {
@@ -683,12 +713,13 @@ document.getElementById('code-input').addEventListener('keydown', e => {
 
 function handleLogin() { tryCode(document.getElementById('code-input').value.trim()); }
 
-function tryCode(raw) {
+function tryCode(raw, silent = false) {
   const match = Object.entries(GROUPS).find(([k]) => k.toLowerCase() === raw.toLowerCase());
   if (!match) {
-    document.getElementById('login-error').textContent = 'Code not recognised — try again.';
+    if (!silent) document.getElementById('login-error').textContent = 'Code not recognised — try again.';
     return;
   }
+  saveSession(raw);          // persist for 30 days
   loadItinerary(match[1]);
 }
 
