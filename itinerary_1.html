@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Your Itinerary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold: #c9a96e;
+    --gold-dim: rgba(201,169,110,0.15);
+    --gold-border: rgba(201,169,110,0.3);
+    --bg: #0f0e0c;
+    --bg-card: #161411;
+    --bg-card-dark: #0d0c0b;
+    --bg-icon: #1e1b17;
+    --border: #2a2520;
+    --border-dim: #1e1b17;
+    --text-primary: #f5f0e8;
+    --text-secondary: #e8e0d0;
+    --text-muted: #6b6356;
+    --text-dim: #5a5045;
+    --text-ghost: #3a3028;
+    --serif: 'Cormorant Garamond', Georgia, serif;
+    --sans: 'Inter', system-ui, sans-serif;
+  }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: var(--sans);
+    min-height: 100vh;
+    overscroll-behavior: none;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── APP SHELL ── */
+  #app {
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* ── LOGIN SCREEN ── */
+  #login-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 40px 32px;
+    background: var(--bg);
+  }
+  .login-logo {
+    font-family: var(--serif);
+    font-size: 13px;
+    font-weight: 300;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 48px;
+  }
+  .login-heading {
+    font-family: var(--serif);
+    font-size: 34px;
+    font-weight: 300;
+    color: var(--text-primary);
+    line-height: 1.2;
+    text-align: center;
+    margin-bottom: 12px;
+    letter-spacing: 0.01em;
+  }
+  .login-sub {
+    font-size: 13px;
+    color: var(--text-muted);
+    text-align: center;
+    margin-bottom: 48px;
+    line-height: 1.6;
+  }
+  .login-input-wrap {
+    width: 100%;
+    position: relative;
+    margin-bottom: 16px;
+  }
+  .login-input {
+    width: 100%;
+    background: var(--bg-card);
+    border: 0.5px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    font-size: 16px;
+    color: var(--text-primary);
+    font-family: var(--sans);
+    letter-spacing: 0.1em;
+    outline: none;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+  .login-input::placeholder { color: var(--text-ghost); letter-spacing: 0.05em; }
+  .login-input:focus { border-color: var(--gold); }
+  .login-btn {
+    width: 100%;
+    background: var(--gold);
+    color: #0f0e0c;
+    border: none;
+    border-radius: 12px;
+    padding: 16px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-family: var(--sans);
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  .login-btn:active { opacity: 0.85; transform: scale(0.99); }
+  .login-error {
+    font-size: 12px;
+    color: #c0614a;
+    text-align: center;
+    margin-top: 12px;
+    min-height: 18px;
+    letter-spacing: 0.02em;
+  }
+  .login-ornament {
+    margin-top: 60px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    opacity: 0.2;
+  }
+  .login-ornament-line { flex: 1; height: 0.5px; background: var(--gold); }
+  .login-ornament-diamond {
+    width: 6px; height: 6px;
+    background: var(--gold);
+    transform: rotate(45deg);
+  }
+
+  /* ── MAIN APP ── */
+  #main-app { display: none; }
+
+  /* ── BANNER HERO ── */
+  #banner-hero {
+    position: relative;
+    height: 240px;
+    overflow: hidden;
+    background: #0a0908;
+    transition: height 0.4s ease;
+  }
+  #banner-hero.no-image { height: auto; padding-top: 52px; }
+  #banner-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    transition: opacity 0.5s ease;
+  }
+  .banner-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(10,9,8,0.2) 0%,
+      rgba(10,9,8,0.5) 50%,
+      rgba(10,9,8,0.95) 100%
+    );
+  }
+  .banner-content {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 20px 24px 18px;
+  }
+  #banner-hero.no-image .banner-content {
+    position: static;
+    padding: 0 24px 20px;
+  }
+  .banner-eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 5px;
+    font-weight: 400;
+  }
+  #group-name {
+    font-family: var(--serif);
+    font-size: 30px;
+    font-weight: 300;
+    color: var(--text-primary);
+    line-height: 1.15;
+    margin-bottom: 16px;
+    letter-spacing: 0.01em;
+  }
+
+  /* ── DAY TABS ── */
+  #day-tabs {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+  #day-tabs::-webkit-scrollbar { display: none; }
+  .day-tab {
+    flex-shrink: 0;
+    padding: 7px 15px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    border: 0.5px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.3);
+    background: rgba(0,0,0,0.3);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    transition: all 0.2s;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    line-height: 1;
+  }
+  #banner-hero.no-image .day-tab {
+    border-color: var(--border);
+    color: var(--text-ghost);
+    background: transparent;
+    backdrop-filter: none;
+  }
+  .day-tab.active {
+    background: var(--gold) !important;
+    color: #0f0e0c !important;
+    border-color: var(--gold) !important;
+  }
+  .day-tab-sub {
+    display: block;
+    font-size: 9px;
+    opacity: 0.65;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 2px;
+  }
+
+  /* ── CLOCK STRIP ── */
+  #clock-strip {
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 0.5px solid var(--border-dim);
+    background: var(--bg);
+  }
+  #clock-time {
+    font-family: var(--serif);
+    font-size: 14px;
+    color: var(--text-dim);
+    font-weight: 300;
+    letter-spacing: 0.1em;
+  }
+  #clock-label {
+    font-size: 10px;
+    color: var(--text-ghost);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* ── TIMELINE ── */
+  #timeline-wrap {
+    position: relative;
+    padding: 24px 0 120px;
+    min-height: 300px;
+  }
+  #timeline-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center top;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+  }
+
+  .tl-item {
+    display: grid;
+    grid-template-columns: 52px 1px 1fr;
+    padding: 0 20px 0 16px;
+    margin-bottom: 2px;
+    position: relative;
+  }
+  .tl-time {
+    font-size: 10px;
+    padding-top: 15px;
+    text-align: right;
+    padding-right: 13px;
+    letter-spacing: 0.04em;
+    line-height: 1.35;
+    font-weight: 400;
+    white-space: nowrap;
+    color: var(--text-dim);
+    transition: color 0.3s;
+  }
+  .tl-spine {
+    width: 1px;
+    background: var(--border);
+    position: relative;
+    margin-top: 15px;
+    transition: background 0.3s;
+  }
+  .tl-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+    border: 1.5px solid #3a3028;
+    position: absolute;
+    left: -3.5px; top: 0;
+    transition: all 0.3s;
+  }
+  .tl-card {
+    margin-left: 14px;
+    margin-bottom: 10px;
+    border-radius: 13px;
+    overflow: hidden;
+    cursor: pointer;
+    background: var(--bg-card);
+    border: 0.5px solid var(--border);
+    transition: border-color 0.2s, transform 0.1s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .tl-card:active { transform: scale(0.985); }
+  .tl-card-inner {
+    padding: 14px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .tl-card-icon {
+    width: 38px; height: 38px;
+    border-radius: 9px;
+    background: var(--bg-icon);
+    border: 0.5px solid #2e2a24;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 18px;
+    line-height: 1;
+  }
+  .tl-card-body { flex: 1; min-width: 0; }
+  .tl-card-title {
+    font-family: var(--serif);
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    line-height: 1.3;
+    margin-bottom: 5px;
+    letter-spacing: 0.01em;
+  }
+  .tl-card-loc {
+    font-size: 11px;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    letter-spacing: 0.02em;
+  }
+  .tl-card-loc svg { opacity: 0.5; flex-shrink: 0; }
+  .tl-card-chevron {
+    color: #3a3028;
+    margin-top: 3px;
+    flex-shrink: 0;
+  }
+
+  /* ── PAST STATE ── */
+  .tl-item.past .tl-time { color: #2a2722; }
+  .tl-item.past .tl-spine { background: #1a1815; }
+  .tl-item.past .tl-dot { background: #181614; border-color: #1c1a16; }
+  .tl-item.past .tl-card {
+    background: var(--bg-card-dark);
+    border-color: #181614;
+    opacity: 0.38;
+    filter: saturate(0.15) brightness(0.85);
+  }
+  .tl-item.past .tl-card-title { color: #383228; }
+
+  /* ── UPCOMING STATE ── */
+  .tl-item.upcoming .tl-dot {
+    background: var(--gold);
+    border-color: var(--gold);
+    box-shadow: 0 0 0 4px rgba(201,169,110,0.12);
+  }
+  .tl-item.upcoming .tl-card {
+    background: #1a1710;
+    border-color: #3d3220;
+  }
+  .tl-item.upcoming .tl-card-inner {
+    background: linear-gradient(110deg, rgba(201,169,110,0.07) 0%, transparent 65%);
+  }
+  .tl-item.upcoming .tl-card-title { color: #f0e6cc; }
+  .tl-item.upcoming .tl-spine { background: rgba(201,169,110,0.18); }
+  .tl-item.upcoming .tl-time { color: var(--gold); opacity: 0.85; }
+  .tl-item.upcoming .tl-card-icon {
+    border-color: rgba(201,169,110,0.2);
+    background: rgba(201,169,110,0.07);
+  }
+
+  /* ── UP NEXT BADGE ── */
+  .up-next-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--gold-dim);
+    border: 0.5px solid var(--gold-border);
+    color: var(--gold);
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin: 4px 0 10px 80px;
+  }
+  .up-next-pulse {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--gold);
+    flex-shrink: 0;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
+
+  /* ── LOADING ── */
+  #loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 40px;
+    gap: 16px;
+  }
+  .loading-spinner {
+    width: 24px; height: 24px;
+    border: 1.5px solid var(--border);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text {
+    font-size: 11px;
+    color: var(--text-ghost);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    text-align: center;
+    padding: 60px 40px;
+    color: var(--text-ghost);
+    font-size: 13px;
+    letter-spacing: 0.05em;
+  }
+  .empty-state-title {
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 300;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+  }
+
+  /* ── BOTTOM DRAWER ── */
+  #drawer-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0);
+    z-index: 100;
+    transition: background 0.3s;
+  }
+  #drawer-backdrop.open { background: rgba(0,0,0,0.6); }
+
+  #drawer {
+    position: fixed;
+    bottom: 0; left: 50%; 
+    transform: translateX(-50%) translateY(100%);
+    width: 100%;
+    max-width: 430px;
+    background: #161411;
+    border-top: 0.5px solid #2e2820;
+    border-radius: 22px 22px 0 0;
+    z-index: 101;
+    transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+    max-height: 85vh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  #drawer.open { transform: translateX(-50%) translateY(0); }
+
+  .drawer-handle-wrap {
+    display: flex;
+    justify-content: center;
+    padding: 14px 0 4px;
+    cursor: pointer;
+  }
+  .drawer-handle {
+    width: 38px; height: 3px;
+    background: #2e2820;
+    border-radius: 2px;
+  }
+  .drawer-body { padding: 8px 24px 48px; }
+  .drawer-eyebrow {
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 7px;
+    font-weight: 400;
+  }
+  .drawer-title {
+    font-family: var(--serif);
+    font-size: 26px;
+    font-weight: 400;
+    color: #f0e6cc;
+    line-height: 1.2;
+    margin-bottom: 16px;
+    letter-spacing: 0.01em;
+  }
+  .drawer-story {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.75;
+    margin-bottom: 20px;
+  }
+  .drawer-divider {
+    height: 0.5px;
+    background: var(--border-dim);
+    margin-bottom: 4px;
+  }
+  .drawer-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 0;
+    border-bottom: 0.5px solid var(--border-dim);
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.4;
+  }
+  .drawer-row:last-child { border-bottom: none; }
+  .drawer-row-icon {
+    width: 30px; height: 30px;
+    border-radius: 7px;
+    background: var(--bg-icon);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+    border: 0.5px solid var(--border);
+  }
+  .drawer-link {
+    color: var(--gold);
+    text-decoration: none;
+    letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .drawer-link:after {
+    content: '→';
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- LOGIN -->
+  <div id="login-screen">
+    <div class="login-logo">— Guest Itinerary —</div>
+    <h1 class="login-heading">Welcome,<br>you're expected.</h1>
+    <p class="login-sub">Enter your access code<br>to view your itinerary.</p>
+    <div class="login-input-wrap">
+      <input id="code-input" class="login-input" type="text" placeholder="Access code" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+    </div>
+    <button class="login-btn" onclick="handleLogin()">View my itinerary</button>
+    <div class="login-error" id="login-error"></div>
+    <div class="login-ornament">
+      <div class="login-ornament-line"></div>
+      <div class="login-ornament-diamond"></div>
+      <div class="login-ornament-line"></div>
+    </div>
+  </div>
+
+  <!-- MAIN APP -->
+  <div id="main-app">
+
+    <!-- Banner -->
+    <div id="banner-hero" class="no-image">
+      <img id="banner-img" src="" alt="" style="display:none;" />
+      <div class="banner-overlay" id="banner-overlay" style="display:none;"></div>
+      <div class="banner-content">
+        <div class="banner-eyebrow">Your itinerary</div>
+        <div id="group-name">—</div>
+        <div id="day-tabs"></div>
+      </div>
+    </div>
+
+    <!-- Clock -->
+    <div id="clock-strip">
+      <span id="clock-time">—</span>
+      <span id="clock-label">—</span>
+    </div>
+
+    <!-- Timeline -->
+    <div id="timeline-wrap">
+      <div id="timeline-bg"></div>
+      <div id="timeline-content">
+        <div id="loading">
+          <div class="loading-spinner"></div>
+          <div class="loading-text">Loading your itinerary</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Drawer backdrop -->
+<div id="drawer-backdrop" onclick="closeDrawer()"></div>
+
+<!-- Drawer -->
+<div id="drawer">
+  <div class="drawer-handle-wrap" onclick="closeDrawer()">
+    <div class="drawer-handle"></div>
+  </div>
+  <div class="drawer-body" id="drawer-body"></div>
+</div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────────────────
+const SHEET_ID = '1Y0qgm9aov7qaQOcdE3khXit85loGs9FmU2tvsl0ZCXU';
+const API_KEY  = 'AIzaSyBpvELhAkbUZQXwjhz65S28tRX4iNHIdhk';
+
+const GROUPS = {
+  '2012':    { tab: 'obrien',      name: 'April Visit' },
+  'wyllie':  { tab: 'assynipple',  name: 'Wyllie' },
+  'kelly':   { tab: 'kelly',       name: 'Stacey & Aaron' },
+  'GROUP4':  { tab: 'group4',      name: 'Group 4' },
+  'GROUP5':  { tab: 'group5',      name: 'Group 5' },
+};
+
+const DAY_NAMES = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+// ── STATE ────────────────────────────────────────────────────────────────
+let currentGroup  = null;
+let allRows       = [];      // raw parsed rows
+let dayMap        = {};      // dayNum → { items[], bgImage, bannerImage }
+let currentDay    = 1;
+let clockInterval = null;
+
+// ── UTILS ────────────────────────────────────────────────────────────────
+
+// Convert Google Drive share URLs to direct image URLs
+function toDirectImageUrl(url) {
+  if (!url) return '';
+  url = url.trim();
+  // Drive: /file/d/FILE_ID/view or /open?id=FILE_ID
+  const m1 = url.match(/\/file\/d\/([^/]+)/);
+  if (m1) return `https://drive.google.com/uc?export=view&id=${m1[1]}`;
+  const m2 = url.match(/[?&]id=([^&]+)/);
+  if (m2 && url.includes('drive.google.com')) return `https://drive.google.com/uc?export=view&id=${m2[1]}`;
+  return url;
+}
+
+function fmt12(hour24) {
+  const h = parseInt(hour24, 10);
+  if (isNaN(h)) return '';
+  const suffix = h >= 12 ? 'pm' : 'am';
+  const h12 = h % 12 || 12;
+  return `${h12}${suffix}`;
+}
+
+function nowMins() {
+  const n = new Date();
+  return n.getHours() * 60 + n.getMinutes();
+}
+
+function clockString() {
+  const n = new Date();
+  let h = n.getHours(), m = n.getMinutes();
+  const s = h >= 12 ? 'pm' : 'am';
+  h = h % 12 || 12;
+  return `${h}:${String(m).padStart(2,'0')} ${s}`;
+}
+
+function todayLabel(dayNum) {
+  const now = new Date();
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  return `${days[now.getDay()]} · Day ${dayNum}`;
+}
+
+// ── TODAY'S DAY NUMBER ───────────────────────────────────────────────────
+// Matches today's calendar date against the DATE column in the Sheet.
+// Falls back to first day if no DATE data or no match found.
+
+function todayISO() {
+  const n = new Date();
+  const y = n.getFullYear();
+  const m = String(n.getMonth() + 1).padStart(2, '0');
+  const d = String(n.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+function normaliseDate(raw) {
+  if (!raw) return '';
+  raw = String(raw).trim();
+
+  // Google Sheets serial number (days since 1899-12-30)
+  if (/^\d{4,5}$/.test(raw)) {
+    const serial = parseInt(raw, 10);
+    const msPerDay = 86400000;
+    // Sheets epoch: Dec 30 1899
+    const epoch = new Date(Date.UTC(1899, 11, 30));
+    const d = new Date(epoch.getTime() + serial * msPerDay);
+    return d.toISOString().slice(0, 10);
+  }
+
+  // YYYY-MM-DD (possibly with time)
+  if (/^\d{4}-\d{2}-\d{2}/.test(raw)) return raw.slice(0, 10);
+
+  // DD/MM/YYYY
+  const dmy = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if (dmy) return `${dmy[3]}-${String(dmy[2]).padStart(2,'0')}-${String(dmy[1]).padStart(2,'0')}`;
+
+  // MM/DD/YYYY
+  const mdy = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})/);
+  if (mdy) {
+    const yr = mdy[3].length === 2 ? '20' + mdy[3] : mdy[3];
+    return `${yr}-${String(mdy[1]).padStart(2,'0')}-${String(mdy[2]).padStart(2,'0')}`;
+  }
+
+  // Anything else — try JS Date (handles "April 10, 2025", "10 Apr 2025" etc.)
+  // Use noon UTC to avoid timezone-rollback to previous day
+  const parsed = new Date(raw);
+  if (!isNaN(parsed)) {
+    const y = parsed.getFullYear();
+    const m = String(parsed.getMonth() + 1).padStart(2, '0');
+    const d = String(parsed.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+  return '';
+}
+
+function getTodayDayNumber(availableDays) {
+  const today = todayISO();
+
+  // Log what dates were found — helps debug Sheet format issues
+  console.log('[Itinerary] Today is', today);
+  availableDays.forEach(d => {
+    const raw = (dayMap[d] || {}).date;
+    console.log(`[Itinerary] Day ${d} raw date: "${raw}" → normalised: "${normaliseDate(raw)}"`);
+  });
+
+  // Exact match: day whose DATE == today
+  for (const d of availableDays) {
+    const raw = (dayMap[d] || {}).date;
+    if (raw && normaliseDate(raw) === today) {
+      console.log('[Itinerary] Matched today → Day', d);
+      return d;
+    }
+  }
+
+  // No exact match: show nearest upcoming day
+  for (const d of availableDays) {
+    const raw = (dayMap[d] || {}).date;
+    if (raw && normaliseDate(raw) > today) {
+      console.log('[Itinerary] No date match — showing next upcoming day:', d);
+      return d;
+    }
+  }
+
+  // All days are in the past, or no dates set at all → first day
+  console.log('[Itinerary] No match found — defaulting to Day', availableDays[0]);
+  return availableDays[0];
+}
+
+// ── LOGIN ────────────────────────────────────────────────────────────────
+function handleLogin() {
+  const raw  = document.getElementById('code-input').value.trim();
+  const code = raw; // case-sensitive as defined
+  if (GROUPS[code]) {
+    currentGroup = GROUPS[code];
+    currentGroup.code = code;
+    localStorage.setItem('itinerary_last_code', code);
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('main-app').style.display = 'block';
+    document.getElementById('group-name').textContent = currentGroup.name;
+    startClock();
+    fetchSheet(currentGroup.tab);
+  } else {
+    const err = document.getElementById('login-error');
+    err.textContent = 'That code doesn\'t match any itinerary.';
+    setTimeout(() => { err.textContent = ''; }, 3000);
+  }
+}
+
+document.getElementById('code-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') handleLogin();
+});
+
+// ── URL CODE / SESSION RESTORE ────────────────────────────────────────────
+// 1. ?code=XXXX in URL → auto-login (QR code scan)
+// 2. Saved code in localStorage → skip login screen on refresh
+(function checkUrlCode() {
+  const params = new URLSearchParams(window.location.search);
+  let code = params.get('code');
+
+  // Fall back to saved session if no URL code
+  if (!code) {
+    code = localStorage.getItem('itinerary_last_code');
+  }
+
+  if (code && GROUPS[code]) {
+    document.getElementById('code-input').value = code;
+    setTimeout(handleLogin, 50);
+  }
+})();
+
+// ── CLOCK ────────────────────────────────────────────────────────────────
+function startClock() {
+  updateClock();
+  clockInterval = setInterval(updateClock, 60000);
+}
+
+function updateClock() {
+  document.getElementById('clock-time').textContent  = clockString();
+  document.getElementById('clock-label').textContent = todayLabel(currentDay);
+  if (allRows.length) renderDay(currentDay); // refresh states
+}
+
+// ── FETCH ────────────────────────────────────────────────────────────────
+async function fetchSheet(tabName) {
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(tabName)}?key=${API_KEY}`;
+  try {
+    const res  = await fetch(url);
+    const json = await res.json();
+    if (!json.values || json.values.length < 2) {
+      showEmpty('No itinerary data found.');
+      return;
+    }
+    parseSheet(json.values);
+  } catch(e) {
+    showEmpty('Could not load itinerary. Please check your connection.');
+  }
+}
+
+// Convert any hour format to minutes-since-midnight
+// Handles: 24h integer ("14"), "8:00 PM", "8:00 AM", "14:00"
+function hourToMins(raw) {
+  if (!raw) return null;
+  raw = String(raw).trim();
+
+  // "8:00 PM" / "8:00 AM"
+  const ampm = raw.match(/(\d{1,2})(?::(\d{2}))?\s*(AM|PM)/i);
+  if (ampm) {
+    let h = parseInt(ampm[1], 10);
+    const m = parseInt(ampm[2] || '0', 10);
+    const meridiem = ampm[3].toUpperCase();
+    if (meridiem === 'PM' && h !== 12) h += 12;
+    if (meridiem === 'AM' && h === 12) h = 0;
+    return h * 60 + m;
+  }
+
+  // "14:00" or "14:30"
+  const hhmm = raw.match(/^(\d{1,2}):(\d{2})$/);
+  if (hhmm) return parseInt(hhmm[1], 10) * 60 + parseInt(hhmm[2], 10);
+
+  // Plain integer "14"
+  const plain = parseInt(raw, 10);
+  if (!isNaN(plain)) return plain * 60;
+
+  return null;
+}
+
+// Convert hourToMins result back to a display string like "8pm" or "2:30pm"
+function minsToDisplay(mins) {
+  if (mins === null) return '';
+  const h24 = Math.floor(mins / 60);
+  const m   = mins % 60;
+  const suffix = h24 >= 12 ? 'pm' : 'am';
+  const h12 = h24 % 12 || 12;
+  return m > 0
+    ? `${h12}:${String(m).padStart(2,'0')}<br>${suffix}`
+    : `${h12}<br>${suffix}`;
+}
+
+function parseSheet(values) {
+  const headers = values[0].map(h => h.trim().toUpperCase());
+  const idx = h => headers.indexOf(h);
+  const COL = {
+    day:    idx('DAY'),
+    hour:   idx('HOUR'),
+    act:    idx('ACTIVITY'),
+    loc:    idx('LOCATION') >= 0 ? idx('LOCATION') : idx('ADDRESS'),
+    field1: idx('FIELD1'),
+    url:    idx('URL'),
+    story:  idx('STORY'),
+    bg:     idx('BG_IMAGE'),
+    banner: idx('BANNER_IMAGE'),
+    map:    idx('MAP'),
+    date:   idx('DATE'),
+    addr:   idx('ADDRESS'),
+  };
+
+  dayMap = {};
+  allRows = [];
+
+  for (let i = 1; i < values.length; i++) {
+    const r = values[i];
+    if (!r || !r[COL.day]) continue;
+    const dayNum = parseInt(r[COL.day], 10);
+    if (isNaN(dayNum)) continue;
+
+    const row = {
+      day:    dayNum,
+      hourRaw: r[COL.hour]  || '',
+      hourMins: hourToMins(r[COL.hour] || ''),
+      act:    r[COL.act]    || '',
+      loc:    r[COL.loc]    || '',
+      field1: r[COL.field1] || '',
+      url:    r[COL.url]    || '',
+      story:  r[COL.story]  || '',
+      bg:     COL.bg    >= 0 ? (r[COL.bg]    || '') : '',
+      banner: COL.banner >= 0 ? (r[COL.banner] || '') : '',
+      map:    COL.map   >= 0 ? (r[COL.map]   || '') : '',
+      date:   COL.date  >= 0 ? (r[COL.date]  || '') : '',
+    };
+    allRows.push(row);
+
+    if (!dayMap[dayNum]) dayMap[dayNum] = { items: [], bgImage: '', bannerImage: '', date: '' };
+    dayMap[dayNum].items.push(row);
+    if (row.bg     && !dayMap[dayNum].bgImage)     dayMap[dayNum].bgImage     = row.bg;
+    if (row.banner && !dayMap[dayNum].bannerImage)  dayMap[dayNum].bannerImage = row.banner;
+    if (row.date   && !dayMap[dayNum].date)         dayMap[dayNum].date        = row.date;
+  }
+
+  buildDayTabs();
+  // Select today's day number based on stored visit start date
+  const days = Object.keys(dayMap).map(Number).sort((a,b)=>a-b);
+  currentDay = getTodayDayNumber(days);
+  renderDay(currentDay);
+}
+
+// ── DAY TABS ─────────────────────────────────────────────────────────────
+function buildDayTabs() {
+  const wrap = document.getElementById('day-tabs');
+  wrap.innerHTML = '';
+  const days = Object.keys(dayMap).map(Number).sort((a,b)=>a-b);
+  days.forEach(d => {
+    const btn = document.createElement('button');
+    btn.className = 'day-tab';
+    btn.dataset.day = d;
+    btn.innerHTML = `Day ${d}<span class="day-tab-sub">—</span>`;
+    btn.addEventListener('click', () => switchDay(d));
+    wrap.appendChild(btn);
+  });
+}
+
+function switchDay(d) {
+  currentDay = d;
+  document.querySelectorAll('.day-tab').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.day) === d);
+  });
+  renderDay(d);
+}
+
+// ── RENDER DAY ───────────────────────────────────────────────────────────
+function renderDay(dayNum) {
+  const data = dayMap[dayNum];
+  if (!data) return;
+
+  // Update clock label
+  document.getElementById('clock-label').textContent = todayLabel(dayNum);
+
+  // Banner image
+  applyBannerImage(data.bannerImage);
+
+  // BG image
+  applyBgImage(data.bgImage);
+
+  // Mark active tab
+  document.querySelectorAll('.day-tab').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.day) === dayNum);
+  });
+
+  // Sort items by hour
+  const items = [...data.items].sort((a,b) => {
+    return (a.hourMins ?? 0) - (b.hourMins ?? 0);
+  });
+
+  // Determine whether this day is in the past, today, or future
+  const todayStr   = todayISO();
+  const dayDateRaw = data.date ? normaliseDate(data.date) : '';
+  const dayIsToday = dayDateRaw === todayStr;
+  const dayIsPast  = dayDateRaw && dayDateRaw < todayStr;
+  // dayIsFuture  = dayDateRaw > todayStr (or no date — show normally)
+
+  const now = nowMins();
+  let upNextSet = false;
+
+  const content = document.getElementById('timeline-content');
+  content.innerHTML = '';
+
+  if (!items.length) {
+    content.innerHTML = `<div class="empty-state"><div class="empty-state-title">Nothing scheduled</div>A relaxed day — enjoy.</div>`;
+    return;
+  }
+
+  items.forEach((item, i) => {
+    const itemMins = item.hourMins ?? 0;
+    // Past if: entire day is in the past, OR it's today and the hour has passed
+    const isPast   = dayIsPast || (dayIsToday && item.hourMins !== null && itemMins < now);
+    const isNext   = !upNextSet && !isPast;
+    if (isNext) upNextSet = true;
+
+    // Up next badge
+    if (isNext) {
+      const badge = document.createElement('div');
+      badge.innerHTML = `<div class="up-next-badge"><div class="up-next-pulse"></div>Up next</div>`;
+      content.appendChild(badge);
+    }
+
+    // Build card
+    const wrap = document.createElement('div');
+    wrap.className = `tl-item${isPast ? ' past' : ''}${isNext ? ' upcoming' : ''}`;
+
+    const timeHtml = item.hourMins !== null
+      ? minsToDisplay(item.hourMins)
+      : '—';
+
+    const locHtml = item.loc
+      ? `<div class="tl-card-loc">
+           <svg width="9" height="11" viewBox="0 0 10 14" fill="none"><path d="M5 0C2.24 0 0 2.24 0 5c0 3.75 5 9 5 9s5-5.25 5-9c0-2.76-2.24-5-5-5zm0 6.5A1.5 1.5 0 1 1 5 3.5 1.5 1.5 0 0 1 5 6.5z" fill="currentColor"/></svg>
+           ${escHtml(item.loc)}
+         </div>`
+      : '';
+
+    // Emoji/icon: use first character of activity if it's an emoji, else generic dot
+    const icon = getIcon(item.act);
+
+    wrap.innerHTML = `
+      <div class="tl-time">${timeHtml}</div>
+      <div class="tl-spine"><div class="tl-dot"></div></div>
+      <div class="tl-card" data-idx="${i}">
+        <div class="tl-card-inner">
+          <div class="tl-card-icon">${icon}</div>
+          <div class="tl-card-body">
+            <div class="tl-card-title">${escHtml(item.act)}</div>
+            ${locHtml}
+          </div>
+          <div class="tl-card-chevron">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
+          </div>
+        </div>
+      </div>`;
+
+    wrap.querySelector('.tl-card').addEventListener('click', () => openDrawer(item, itemMins, dayNum));
+    content.appendChild(wrap);
+  });
+}
+
+// ── IMAGES ───────────────────────────────────────────────────────────────
+function applyBannerImage(rawUrl) {
+  const hero     = document.getElementById('banner-hero');
+  const img      = document.getElementById('banner-img');
+  const overlay  = document.getElementById('banner-overlay');
+  const url      = toDirectImageUrl(rawUrl);
+
+  if (!url) {
+    hero.classList.add('no-image');
+    img.style.display    = 'none';
+    overlay.style.display = 'none';
+    img.src = '';
+    return;
+  }
+
+  img.style.display    = 'block';
+  overlay.style.display = 'block';
+  img.style.opacity    = '0';
+  img.onload = () => { img.style.opacity = '1'; };
+  img.onerror = () => {
+    hero.classList.add('no-image');
+    img.style.display    = 'none';
+    overlay.style.display = 'none';
+  };
+  img.src = url;
+  hero.classList.remove('no-image');
+}
+
+function applyBgImage(rawUrl) {
+  const bg  = document.getElementById('timeline-bg');
+  const url = toDirectImageUrl(rawUrl);
+  if (!url) {
+    bg.style.backgroundImage = '';
+    bg.style.opacity = '0';
+    return;
+  }
+  bg.style.backgroundImage = `url('${url}')`;
+  bg.style.opacity = '0.07';
+}
+
+// ── MAPS URL ─────────────────────────────────────────────────────────────
+// Priority: explicit MAP column value → auto-generated from LOCATION text.
+// The Sheets HYPERLINK formula only returns display text via the API, so we
+// never rely on it. We build the URL here from the raw address string.
+function mapsUrl(item) {
+  // If MAP column has a real URL, use it directly
+  const raw = (item.map || '').trim();
+  if (raw && (raw.startsWith('http://') || raw.startsWith('https://'))) return raw;
+
+  // Build from LOCATION text — use /dir/ so it routes from current location
+  const loc = (item.loc || '').trim();
+  if (!loc) return '';
+  return 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(loc) + '&travelmode=driving';
+}
+
+// ── DRAWER ───────────────────────────────────────────────────────────────
+function openDrawer(item, itemMins, dayNum) {
+  const body    = document.getElementById('drawer-body');
+  const timeStr = item.hourMins !== null
+    ? `${minsToDisplay(item.hourMins).replace('<br>', ' ')} · Day ${dayNum}`
+    : `Day ${dayNum}`;
+
+  let rows = '';
+  if (item.loc) {
+    const url = mapsUrl(item);
+    if (url) {
+      rows += `<div class="drawer-row">
+        <div class="drawer-row-icon">📍</div>
+        <a class="drawer-link" href="${escAttr(url)}" target="_blank" rel="noopener">${escHtml(item.loc)}</a>
+      </div>`;
+    } else {
+      rows += drawerRow('📍', escHtml(item.loc));
+    }
+  }
+  if (item.field1) rows += drawerRow('📝', escHtml(item.field1));
+  if (item.url) {
+    const displayUrl = item.url.length > 38 ? item.url.slice(0,35)+'…' : item.url;
+    rows += `<div class="drawer-row">
+      <div class="drawer-row-icon">🔗</div>
+      <a class="drawer-link" href="${escAttr(item.url)}" target="_blank" rel="noopener">${escHtml(displayUrl)}</a>
+    </div>`;
+  }
+
+  body.innerHTML = `
+    <div class="drawer-eyebrow">${escHtml(timeStr)}</div>
+    <div class="drawer-title">${escHtml(item.act)}</div>
+    ${item.story ? `<div class="drawer-story">${escHtml(item.story)}</div>` : ''}
+    ${rows ? `<div class="drawer-divider"></div>${rows}` : ''}
+  `;
+
+  const backdrop = document.getElementById('drawer-backdrop');
+  const drawer   = document.getElementById('drawer');
+  backdrop.style.display = 'block';
+  requestAnimationFrame(() => {
+    backdrop.classList.add('open');
+    drawer.classList.add('open');
+  });
+}
+
+function drawerRow(icon, text) {
+  return `<div class="drawer-row"><div class="drawer-row-icon">${icon}</div>${text}</div>`;
+}
+
+function closeDrawer() {
+  const backdrop = document.getElementById('drawer-backdrop');
+  const drawer   = document.getElementById('drawer');
+  backdrop.classList.remove('open');
+  drawer.classList.remove('open');
+  setTimeout(() => { backdrop.style.display = 'none'; }, 350);
+}
+
+// Close drawer on swipe down
+let touchStartY = 0;
+document.getElementById('drawer').addEventListener('touchstart', e => {
+  touchStartY = e.touches[0].clientY;
+}, { passive: true });
+document.getElementById('drawer').addEventListener('touchend', e => {
+  const delta = e.changedTouches[0].clientY - touchStartY;
+  if (delta > 60) closeDrawer();
+}, { passive: true });
+
+// ── HELPERS ───────────────────────────────────────────────────────────────
+function showEmpty(msg) {
+  document.getElementById('timeline-content').innerHTML =
+    `<div class="empty-state"><div class="empty-state-title">Hmm.</div>${msg}</div>`;
+}
+
+function escHtml(s) {
+  return String(s)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+
+function escAttr(s) {
+  return String(s).replace(/"/g,'&quot;');
+}
+
+function getIcon(activityName) {
+  // Map keywords to emoji icons
+  const name = (activityName || '').toLowerCase();
+  const map = [
+    [['coffee','café','cafe','breakfast','pastry','pastries','brunch'], '☕'],
+    [['lunch'], '🥗'],
+    [['dinner','restaurant','ester','eat','supper'], '🍽️'],
+    [['wine','cellar','tasting','cocktail','drink','bar','drinks'], '🍷'],
+    [['walk','hike','trail','coastal','beach','swim','surf','paddle'], '🚶'],
+    [['drive','car','transfer','transport','taxi','uber'], '🚗'],
+    [['boat','ferry','cruise','kayak','sail'], '⛵'],
+    [['market','shop','shopping'], '🛍️'],
+    [['museum','gallery','art','exhibit'], '🎨'],
+    [['spa','massage','wellness','yoga'], '🧘'],
+    [['theatre','theater','show','concert','music','performance'], '🎭'],
+    [['arrive','arrival','check in','checkin','welcome'], '🏡'],
+    [['depart','departure','check out','checkout','farewell','goodbye'], '✈️'],
+    [['picnic','park','garden','outdoor'], '🌿'],
+    [['tour','sightseeing','explore'], '🗺️'],
+    [['sunset','sunrise','view'], '🌅'],
+    [['cinema','movie','film'], '🎬'],
+    [['sport','tennis','golf','swim'], '⛳'],
+    [['sleep','rest','relax','nap','free time'], '💤'],
+  ];
+  for (const [keys, icon] of map) {
+    if (keys.some(k => name.includes(k))) return icon;
+  }
+  return '✦';
+}
+</script>
+</body>
+</html>
